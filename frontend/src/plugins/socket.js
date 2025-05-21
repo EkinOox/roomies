@@ -4,7 +4,7 @@ export default {
   install: (app) => {
     socket.connect();
 
-    // Optionnel : gestion des �v�nements globaux
+    // Optionnel : gestion des évènements globaux
     socket.on("connect", () => {
       console.log("Socket connecté :", socket.id);
     });

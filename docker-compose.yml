@@ -26,7 +26,7 @@ services:
     volumes:
       - ./backend:/app
     environment:
-      DATABASE_URL: mysql://user:password@mysql:3306/roomies
+      DATABASE_URL: ${DATABASE_URL}
     depends_on:
       - mysql
     networks:
@@ -93,8 +93,6 @@ volumes:
 
 networks:
   frontend-backend:
-    driver: overlay
-    attachable: true
+    driver: bridge
   backend-db:
-    driver: overlay
-    attachable: true
+    driver: bridge
