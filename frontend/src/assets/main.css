@@ -1,36 +1,81 @@
 @import "tailwindcss";
-@import './base.css';
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+
+body {
+  background:
+    linear-gradient(135deg, var(--vt-c-teal) 0%, var(--vt-c-purple) 70%),
+    radial-gradient(circle at top left, rgba(62, 198, 181, 0.3), transparent 70%),
+    radial-gradient(circle at bottom right, rgba(169, 143, 227, 0.25), transparent 60%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  color: var(--color-text);
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+.shadow-neumorphic {
+  box-shadow:
+    4px 4px 10px rgba(0, 0, 0, 0.3),
+    -4px -4px 10px rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+
+/* color palette personnalisée avec effet Neumorphism et moderne */
+:root {
+  --vt-c-white: #ffffff;
+  --vt-c-white-soft: #f9f9f9;
+  --vt-c-white-mute: #f2f2f2;
+
+  --vt-c-black: #181818;
+  --vt-c-black-soft: #222222;
+  --vt-c-black-mute: #282828;
+
+  --vt-c-teal: #3EC6B5;
+  --vt-c-coral: #FF6B6B;
+  --vt-c-purple: #A98FE3;
+
+  --vt-c-divider-light-1: rgba(62, 198, 181, 0.3);
+  --vt-c-divider-light-2: rgba(62, 198, 181, 0.15);
+  --vt-c-divider-dark-1: rgba(255, 255, 255, 0.25);
+  --vt-c-divider-dark-2: rgba(255, 255, 255, 0.12);
+
+  --vt-c-text-light-1: #2c3e50;
+  --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
+  --vt-c-text-dark-1: #ffffff;
+  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+
+  /* Dégradés (tu peux les utiliser dans des composants) */
+  --vt-c-gradient-primary: linear-gradient(135deg, #3EC6B5, #A98FE3);
+  --vt-c-gradient-secondary: linear-gradient(135deg, #FF6B6B, #3EC6B5);
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
+/* Couleurs sémantiques du projet */
+:root {
+  --color-background: var(--vt-c-white-soft);
+  --color-background-soft: var(--vt-c-white);
+  --color-background-mute: var(--vt-c-white-mute);
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+  --color-border: var(--vt-c-divider-light-2);
+  --color-border-hover: var(--vt-c-divider-light-1);
+
+  --color-heading: var(--vt-c-text-light-1);
+  --color-text: var(--vt-c-text-light-1);
+
+  --color-primary: var(--vt-c-teal);
+  --color-secondary: var(--vt-c-coral);
+  --color-accent: var(--vt-c-purple);
+
+  --section-gap: 160px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.p-menubar-item-content {
+  background-color: unset !important;
 }
