@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-[--color-background]">
+  <div class="min-h-screen flex items-center justify-center bg-[--color-background] z-30">
     <div class="w-full max-w-md p-8 rounded-2xl bg-[--color-background-soft]">
       <div class="flex justify-between mb-6">
         <button

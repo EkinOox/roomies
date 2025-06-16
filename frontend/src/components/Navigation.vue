@@ -1,11 +1,7 @@
 <template>
-  <div class="flex justify-center mt-6">
+  <div class="flex justify-center mt-6 z-30">
     <div class="w-full max-w-7xl p-2 rounded-xl">
       <Menubar :model="items" class="rounded-xl  shadow-[4px_4px_10px_#000000,-4px_-4px_10px_#ffffff80]">
-
-        <template #start>
-          <img alt="Roomies logo" class="w-12" src="/logo.png" />
-        </template>
 
         <template #item="{ item, hasSubmenu, root }">
           <a v-ripple class="flex items-center px-2 py-2 rounded-lg mx-2 my-2
