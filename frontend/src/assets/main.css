@@ -79,3 +79,14 @@ body {
 .p-menubar-item-content {
   background-color: unset !important;
 }
+.neon-input {
+  @apply w-full p-3 rounded-xl bg-[#0B0F1A] text-white placeholder-gray-500 shadow-inner focus:outline-none focus:ring-2 focus:ring-[#00F0FF] transition;
+}
+
+.neon-button {
+  @apply w-full py-3 px-6 rounded-xl font-semibold text-white shadow-[0_0_10px] hover:shadow-[0_0_20px] transition uppercase tracking-widest;
+}
+
+.neon-box {
+  box-shadow: 0 0 20px #00F0FF, 0 0 30px #FF4FCB;
+}

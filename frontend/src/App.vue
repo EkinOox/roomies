@@ -10,13 +10,13 @@ import Navigation from './components/Navigation.vue'
       <img src="/neon-bg.png" alt="buttons" class="w-full h-full object-cover animate-float" />
     </div>
 
-    <header class="z-10 relative px-8 py-6 flex justify-center flex-col items-center">
+    <header class="z-10 relative px-8 flex justify-center flex-col items-center">
       <Navigation />
       <div class="flex items-center">
         <img src="/logo.png" class=" h-70" alt="Roomies Logo" />
       </div>
     </header>
-    <main class="px-4">
+    <main class="relative z-10 px-4">
       <RouterView />
     </main>
   </div>

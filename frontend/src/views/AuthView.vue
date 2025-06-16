@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-[--color-background] z-30">
+  <div class="flex items-center justify-center bg-[--color-background] z-30">
     <div class="w-full max-w-md p-8 rounded-2xl bg-[--color-background-soft]">
-      <div class="flex justify-between mb-6">
+      <div class="flex justify-between mb-6 gap-4">
         <button
           @click="mode = 'login'"
           :class="buttonClass('login')"
@@ -30,10 +30,11 @@ const currentComponent = computed(() => (mode.value === 'login' ? Login : Regist
 
 function buttonClass(type) {
   return [
-    'w-1/2 py-2 rounded-xl text-sm font-semibold transition duration-300',
+    'w-1/2 py-2 rounded-xl text-sm font-bold transition duration-300 uppercase tracking-widest',
+    'border-2',
     mode.value === type
-      ? 'bg-white text-[--color-primary] shadow-inner'
-      : 'bg-[--color-background] text-gray-500 hover:text-[--color-primary] hover:bg-white'
+      ? 'text-[#00F0FF] border-[#00F0FF] shadow-[0_0_10px_#00F0FF]'
+      : 'text-[#FF4FCB] border-[#FF4FCB] hover:text-white hover:bg-[#FF4FCB] hover:shadow-[0_0_15px_#FF4FCB]'
   ]
 }
 </script>

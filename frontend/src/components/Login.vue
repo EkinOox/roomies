@@ -1,30 +1,44 @@
 <template>
-  <form @submit.prevent="login"
-    class="space-y-6 max-w-md mx-auto p-8 rounded-2xl shadow-xl bg-[var(--color-background-soft)] transition">
-    <h2 class="text-3xl font-bold text-center text-[var(--color-primary)]">Connexion</h2>
+  <form
+    @submit.prevent="login"
+    class="space-y-6 max-w-md mx-auto p-8 rounded-2xl bg-[#111827] neon-box shadow-xl transition"
+  >
+    <h2 class="text-3xl font-extrabold text-center text-[#00F0FF] drop-shadow-[0_0_5px_#00F0FF]">
+      Connexion
+    </h2>
 
     <div>
-      <input v-model="email" type="email" placeholder="Email"
-        class="w-full p-3 rounded-xl bg-[var(--color-background-mute)] text-[var(--color-text)] placeholder-gray-400 dark:placeholder-gray-500 shadow-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition"
-        required />
+      <input
+        v-model="email"
+        type="email"
+        placeholder="Email"
+        class="neon-input"
+        required
+      />
     </div>
 
     <div>
-      <input v-model="password" type="password" placeholder="Mot de passe"
-        class="w-full p-3 rounded-xl bg-[var(--color-background-mute)] text-[var(--color-text)] placeholder-gray-400 dark:placeholder-gray-500 shadow-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition"
-        required />
+      <input
+        v-model="password"
+        type="password"
+        placeholder="Mot de passe"
+        class="neon-input"
+        required
+      />
     </div>
 
-    <button type="submit"
-      class="w-full py-3 px-6 rounded-xl font-semibold text-white bg-[var(--color-primary)] hover:bg-teal-500 transition shadow-md">
+    <button
+      type="submit"
+      class="neon-button bg-[#FF4FCB] hover:bg-pink-500"
+    >
       Se connecter
     </button>
 
-    <p v-if="error" class="text-[var(--color-secondary)] text-sm text-center mt-2">
+    <p v-if="error" class="text-[#FF4FCB] text-sm text-center mt-2">
       {{ error }}
     </p>
 
-    <p v-if="success" class="text-[var(--color-primary)] text-sm text-center mt-2">
+    <p v-if="success" class="text-[#00F0FF] text-sm text-center mt-2">
       Connexion réussie !
     </p>
   </form>
@@ -60,7 +74,6 @@ const login = async () => {
     password.value = ''
 
     router.push('/')
-
   } catch (e) {
     error.value = e.response?.data?.message || 'Identifiants invalides'
   }
