@@ -92,7 +92,7 @@ const items = ref([
         separator: true,
       },
       {
-        label: "2022",
+        label: "2048",
         icon: "pi pi-bolt",
         command: () => router.push("/jeux")
       },

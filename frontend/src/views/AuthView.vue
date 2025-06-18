@@ -34,7 +34,7 @@ function buttonClass(type) {
     'border-2',
     mode.value === type
       ? 'text-[#00F0FF] border-[#00F0FF] shadow-[0_0_10px_#00F0FF]'
-      : 'text-[#FF4FCB] border-[#FF4FCB] hover:text-white hover:bg-[#FF4FCB] hover:shadow-[0_0_15px_#FF4FCB]'
+      : 'text-[#FF4FCB] border-[#FF4FCB] hover:text-white hover:bg-[#00F0FF] hover:shadow-[0_0_15px_#00F0FF] hover:border-[#00F0FF] '
   ]
 }
 </script>

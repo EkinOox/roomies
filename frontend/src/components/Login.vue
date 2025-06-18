@@ -29,7 +29,7 @@
 
     <button
       type="submit"
-      class="neon-button bg-[#FF4FCB] hover:bg-pink-500"
+      class="neon-button bg-[#FF4FCB] hover:bg-[#00F0FF]"
     >
       Se connecter
     </button>
