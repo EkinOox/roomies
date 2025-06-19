@@ -73,12 +73,22 @@ const register = async () => {
       username: username.value,
       password: password.value,
     })
+
     success.value = true
     email.value = ''
     username.value = ''
     password.value = ''
   } catch (e) {
-    error.value = e.response?.data?.message || "Erreur lors de l'inscription"
+  console.log('Erreur Axios:', e.response);
+
+  if (e.response && e.response.data && e.response.data.message) {
+    error.value = e.response.data.message
+  } else if (e.response && typeof e.response.data === 'string') {
+    error.value = e.response.data
+  } else {
+    error.value = "Erreur lors de l'inscription"
   }
+}
+
 }
 </script>

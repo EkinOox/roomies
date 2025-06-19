@@ -10,10 +10,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\HasLifecycleCallbacks]
+#[UniqueEntity('email', message: 'Cet email est dï¿½jï¿½ utilisï¿½.')]
+#[UniqueEntity('username', message: 'Ce nom d\'utilisateur est dï¿½jï¿½ utilisï¿½.')]
 class User implements PasswordAuthenticatedUserInterface, UserInterface
 {
     #[ORM\Id]
@@ -52,24 +55,31 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
      */
     #[ORM\ManyToMany(targetEntity: Game::class)]
     #[Groups(['user:read'])]
+    #[ORM\JoinTable(name: 'user_game')]
     private Collection $favoris;
 
-    /**
-     * @var Collection<int, self>
-     */
-    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'friends')]
-    #[ORM\JoinTable(name: 'user_friends',
-        joinColumns: [new ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')],
-        inverseJoinColumns: [new ORM\JoinColumn(name: 'friend_id', referencedColumnName: 'id')]
-    )]
+    #[ORM\Column]
     #[Groups(['user:read'])]
-    private Collection $friends;
+    private array $roles = [];
+
+    /**
+     * @var Collection<int, Friendship>
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Friendship::class)]
+    private Collection $sentFriendRequests;
+
+    /**
+     * @var Collection<int, Friendship>
+     */
+    #[ORM\OneToMany(mappedBy: 'friend', targetEntity: Friendship::class)]
+    private Collection $receivedFriendRequests;
 
     public function __construct()
     {
         $this->rooms = new ArrayCollection();
         $this->favoris = new ArrayCollection();
-        $this->friends = new ArrayCollection();
+        $this->sentFriendRequests = new ArrayCollection();
+        $this->receivedFriendRequests = new ArrayCollection();
     }
 
     #[ORM\PrePersist]
@@ -131,23 +141,19 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
 
     public function getRoles(): array
     {
-        return ['ROLE_USER'];
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER'; // garantit que chaque utilisateur a au moins ce rï¿½le
+        return array_unique($roles);
     }
 
     public function eraseCredentials(): void
     {
-        // Nettoyer les données sensibles temporaires si besoin
+        // Nettoyer les donnï¿½es sensibles temporaires si besoin
     }
 
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
-    }
-
-    public function getSalt(): ?string
-    {
-        // Non utilisé avec bcrypt ou argon2i
-        return null;
+        return (string) $this->username;
     }
 
     public function getRooms(): Collection
@@ -188,25 +194,25 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
         return $this;
     }
 
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
     /**
-     * @return Collection<int, self>
+     * @return Collection<int, Friendship>
      */
-    public function getFriends(): Collection
+    public function getSentFriendRequests(): Collection
     {
-        return $this->friends;
+        return $this->sentFriendRequests;
     }
 
-    public function addFriend(self $friend): static
+    /**
+     * @return Collection<int, Friendship>
+     */
+    public function getReceivedFriendRequests(): Collection
     {
-        if (!$this->friends->contains($friend)) {
-            $this->friends->add($friend);
-        }
-        return $this;
-    }
-
-    public function removeFriend(self $friend): static
-    {
-        $this->friends->removeElement($friend);
-        return $this;
+        return $this->receivedFriendRequests;
     }
 }

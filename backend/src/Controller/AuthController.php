@@ -32,11 +32,32 @@ final class AuthController extends AbstractController
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
+        $email = $data['email'] ?? null;
+        $username = $data['username'] ?? null;
+        $password = $data['password'] ?? null;
+
+        if (!$email || !$username || !$password) {
+            return $this->json(['message' => 'Email, nom d\'utilisateur et mot de passe requis'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Vérifie si un utilisateur existe déjà avec cet email
+        $existingEmail = $em->getRepository(User::class)->findOneBy(['email' => $email]);
+        if ($existingEmail) {
+            return $this->json(['message' => 'Email déjà utilisé'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Vérifie si un utilisateur existe déjà avec ce nom d'utilisateur
+        $existingUsername = $em->getRepository(User::class)->findOneBy(['username' => $username]);
+        if ($existingUsername) {
+            return $this->json(['message' => 'Nom d\'utilisateur déjà utilisé'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Création de l'utilisateur
         $user = new User();
-        $user->setEmail($data['email']);
-        $user->setUsername($data['username']);
+        $user->setEmail($email);
+        $user->setUsername($username);
         $user->setPassword(
-            $passwordHasher->hashPassword($user, $data['password'])
+            $passwordHasher->hashPassword($user, $password)
         );
         $user->setAvatar('img/avatar/10.png');
         $user->setCreatedAt(new \DateTimeImmutable());
@@ -44,7 +65,7 @@ final class AuthController extends AbstractController
         $em->persist($user);
         $em->flush();
 
-        return $this->json(['message' => 'Utilisateur créé'], 201);
+        return $this->json(['message' => 'Utilisateur cr��'], Response::HTTP_CREATED);
     }
 
     #[Route('/login', name: 'login_custom', methods: ['POST'])]
@@ -66,6 +87,8 @@ final class AuthController extends AbstractController
 
         $token = $jwtManager->createFromPayload($user, [
             'roles' => $user->getRoles(),
+            'avatar' => $user->getAvatar(),
+            'email' => $user->getEmail(),
         ]);
 
         return $this->json([

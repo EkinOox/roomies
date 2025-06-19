@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controller;
 
 use App\Entity\User;
@@ -7,7 +8,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use App\Repository\GameRepository;
 
 #[Route('/api/users', name: 'api_users_')]
 final class UserController extends AbstractController
@@ -18,49 +26,140 @@ final class UserController extends AbstractController
         return $this->json($userRepository->findAll(), 200, [], ['groups' => 'user:read']);
     }
 
-    #[Route('/profile', name: 'profile', methods: ['GET'])]
-    public function me(Security $security): JsonResponse
+    #[Route('/profile', name: 'api_me', methods: ['GET'])]
+    public function Profile(Security $security): JsonResponse
     {
         $user = $security->getUser();
 
         if (!$user instanceof User) {
-            return new JsonResponse(['message' => 'Non authentifiÈ'], 401);
+            return $this->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
 
+        return $this->json([
+            'username' => $user->getUserIdentifier(), // ou getUsername() si red√©fini
+            'email' => $user->getEmail(),
+            'avatar' => $user->getAvatar(),
+        ]);
+    }
+
+    #[Route('/{id}', name: 'show', methods: ['GET'])]
+    public function show(User $user): JsonResponse
+    {
         return $this->json($user, 200, [], ['groups' => 'user:read']);
     }
 
-    #[Route('/add-friend/{id}', name: 'add_friend', methods: ['POST'])]
-    public function addFriend(User $friend, EntityManagerInterface $em, Security $security): JsonResponse
-    {
+    #[Route('/update', name: 'update', methods: ['POST'])]
+    public function update(
+        Request $request,
+        Security $security,
+        EntityManagerInterface $em,
+        UserPasswordHasherInterface $passwordHasher,
+        ValidatorInterface $validator,
+        JWTTokenManagerInterface $jwtManager
+    ): JsonResponse {
         $user = $security->getUser();
 
         if (!$user instanceof User) {
-            return new JsonResponse(['message' => 'Unauthorized'], 401);
+            return new JsonResponse(['message' => 'Non authentifi√É¬©'], 401);
         }
 
-        if ($user === $friend) {
-            return new JsonResponse(['message' => 'Impossible de síajouter soi-mÍme en ami'], 400);
+        $data = json_decode($request->getContent(), true);
+
+        $username = $data['username'] ?? null;
+        $email = $data['email'] ?? null;
+        $password = $data['password'] ?? null;
+        $avatarPath = $data['avatar'] ?? null;
+
+        $hasChanged = false;
+        $usernameChanged = false;
+
+        if ($username && $username !== $user->getUsername()) {
+            $user->setUsername($username);
+            $hasChanged = true;
+            $usernameChanged = true;
         }
 
-        $user->addFriend($friend);
+        if ($email && $email !== $user->getEmail()) {
+            $emailConstraint = new Email();
+            $emailConstraint->message = 'Email invalide.';
+            $errors = $validator->validate($email, $emailConstraint);
+            if (count($errors) > 0) {
+                return new JsonResponse(['message' => (string) $errors], 400);
+            }
+            $user->setEmail($email);
+            $hasChanged = true;
+        }
+
+        if ($password) {
+            $hashed = $passwordHasher->hashPassword($user, $password);
+            $user->setPassword($hashed);
+            $hasChanged = true;
+        }
+
+        if ($avatarPath && $avatarPath !== $user->getAvatar()) {
+            $user->setAvatar($avatarPath);
+            $hasChanged = true;
+        }
+
+        if ($hasChanged) {
+            $em->persist($user);
+            $em->flush();
+        }
+
+        // G√É¬©n√É¬©rer un nouveau token si le username a chang√É¬©
+        $token = null;
+        if ($usernameChanged) {
+            $token = $jwtManager->create($user);
+        }
+
+        return $this->json([
+            'user' => $user,
+            'token' => $token,
+        ], 200, [], ['groups' => 'user:read']);
+    }
+    #[Route('/favorites/{id}', name: 'add_favorite', methods: ['POST'])]
+    public function addFavorite(
+        Security $security,
+        GameRepository $gameRepository,
+        int $id,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $user = $security->getUser();
+        if (!$user instanceof User) {
+            return $this->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $game = $gameRepository->find($id);
+        if (!$game) {
+            return $this->json(['message' => 'Jeu non trouv√©'], Response::HTTP_NOT_FOUND);
+        }
+
+        $user->addFavori($game);
         $em->flush();
 
-        return new JsonResponse(['message' => 'Ami ajoutÈ avec succËs']);
+        return $this->json(['message' => 'Jeu ajout√© aux favoris'], Response::HTTP_OK);
     }
 
-    #[Route('/remove-friend/{id}', name: 'remove_friend', methods: ['POST'])]
-    public function removeFriend(User $friend, EntityManagerInterface $em, Security $security): JsonResponse
-    {
+    #[Route('/favorites/{id}', name: 'remove_favorite', methods: ['DELETE'])]
+    public function removeFavorite(
+        Security $security,
+        GameRepository $gameRepository,
+        int $id,
+        EntityManagerInterface $em
+    ): JsonResponse {
         $user = $security->getUser();
-
         if (!$user instanceof User) {
-            return new JsonResponse(['message' => 'Unauthorized'], 401);
+            return $this->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $user->removeFriend($friend);
+        $game = $gameRepository->find($id);
+        if (!$game) {
+            return $this->json(['message' => 'Jeu non trouv√©'], Response::HTTP_NOT_FOUND);
+        }
+
+        $user->removeFavori($game);
         $em->flush();
 
-        return new JsonResponse(['message' => 'Ami supprimÈ avec succËs']);
+        return $this->json(['message' => 'Jeu retir√© des favoris'], Response::HTTP_OK);
     }
 }

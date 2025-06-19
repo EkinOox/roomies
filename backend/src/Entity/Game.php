@@ -15,18 +15,22 @@ class Game
     #[ORM\Column]
     
     #[Groups(['user:read'])]
+    #[Groups(['game:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
     #[Groups(['user:read'])]
+    #[Groups(['game:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['user:read'])]
+    #[Groups(['game:read'])]
     private ?string $image = null;
     
     #[ORM\Column(type: 'text', nullable: true)]
-    #[Groups(['user:read', 'game:read'])]
+    #[Groups(['user:read'])]
+    #[Groups(['game:read'])]
     private ?string $description = null;
 
     public function getId(): ?int

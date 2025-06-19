@@ -67,16 +67,28 @@ const login = async () => {
       password: password.value,
     })
 
-    console.log('Login response:', response.data)
-    auth.setToken(response.data.token)
+    const token = response.data.token
+    auth.setToken(token)
+
+    // Ensuite on récupère le profil de l'utilisateur
+    const profileResponse = await axios.get('http://localhost:8000/api/users/profile', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    // On met à jour le store avec les données utilisateur (dont l'avatar)
+    auth.setUser(profileResponse.data)
 
     success.value = true
     email.value = ''
     password.value = ''
 
+    // Enfin, on redirige
     router.push('/')
   } catch (e) {
     error.value = e.response?.data?.message || 'Identifiants invalides'
   }
 }
+
 </script>
