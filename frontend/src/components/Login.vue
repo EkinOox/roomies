@@ -67,6 +67,7 @@ const login = async () => {
       password: password.value,
     })
 
+    console.log('Login response:', response.data)
     auth.setToken(response.data.token)
 
     success.value = true

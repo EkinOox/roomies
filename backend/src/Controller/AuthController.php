@@ -38,6 +38,7 @@ final class AuthController extends AbstractController
         $user->setPassword(
             $passwordHasher->hashPassword($user, $data['password'])
         );
+        $user->setAvatar('img/avatar/10.png');
         $user->setCreatedAt(new \DateTimeImmutable());
 
         $em->persist($user);
@@ -63,10 +64,12 @@ final class AuthController extends AbstractController
             return $this->json(['message' => 'Identifiants invalides'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $token = $jwtManager->create($user);
+        $token = $jwtManager->createFromPayload($user, [
+            'roles' => $user->getRoles(),
+        ]);
 
         return $this->json([
-            'token' => $token
+            'token' => $token,
         ]);
     }
 }

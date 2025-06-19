@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-
 body {
   background:
     linear-gradient(135deg, var(--vt-c-teal) 0%, var(--vt-c-purple) 70%),
@@ -21,8 +20,7 @@ body {
   border-radius: 12px;
 }
 
-
-/* color palette personnalisée avec effet Neumorphism et moderne */
+/* Palette personnalisée avec effet Neumorphism et moderne */
 :root {
   --vt-c-white: #ffffff;
   --vt-c-white-soft: #f9f9f9;
@@ -46,13 +44,11 @@ body {
   --vt-c-text-dark-1: #ffffff;
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
 
-  /* Dégradés (tu peux les utiliser dans des composants) */
+  /* Dégradés */
   --vt-c-gradient-primary: linear-gradient(135deg, #3EC6B5, #A98FE3);
   --vt-c-gradient-secondary: linear-gradient(135deg, #FF6B6B, #3EC6B5);
-}
 
-/* Couleurs sémantiques du projet */
-:root {
+  /* Couleurs sémantiques */
   --color-background: var(--vt-c-white-soft);
   --color-background-soft: var(--vt-c-white);
   --color-background-mute: var(--vt-c-white-mute);
@@ -70,6 +66,7 @@ body {
   --section-gap: 160px;
 }
 
+/* Global box-sizing */
 *,
 *::before,
 *::after {
@@ -79,6 +76,8 @@ body {
 .p-menubar-item-content {
   background-color: unset !important;
 }
+
+/* Utilitaires personnalisés avec Tailwind */
 .neon-input {
   @apply w-full p-3 rounded-xl bg-[#0B0F1A] text-white placeholder-gray-500 shadow-inner focus:outline-none focus:ring-2 focus:ring-[#00F0FF] transition;
 }
@@ -89,4 +88,54 @@ body {
 
 .neon-box {
   box-shadow: 0 0 20px #00F0FF, 0 0 30px #FF4FCB;
+}
+
+/* Couleurs néon utilisables dans le CSS */
+.bleuNeon {
+  color: #00F0FF;
+}
+
+.roseNeon {
+  color: #FF4FCB;
+}
+
+/* Ombres personnalisées */
+.shadow-neumorph {
+  box-shadow: 8px 8px 15px #a3b1c6, -8px -8px 15px #ffffff;
+}
+
+.shadow-neumorph-inner {
+  box-shadow: inset 8px 8px 15px #a3b1c6, inset -8px -8px 15px #ffffff;
+}
+
+.shadow-neon {
+  box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+}
+
+.shadow-pinkGlow {
+  box-shadow: 0 0 10px #FF00CC, 0 0 20px #FF00CC;
+}
+.bg-backgroundLight {
+  background-color: #f9fafc;
+}
+.bg-gray-light {
+  background-color: #f0f0f3;
+}
+.text-text-light {
+  color: #333;
+}
+.text-neonBlue {
+  color: #1cb3f7;
+}
+.text-neonPurple {
+  color: #9b59b6;
+}
+.bg-neonPink {
+  background-color: #e91e63;
+}
+.hover\:shadow-pinkGlow:hover {
+  box-shadow: 0 0 8px 2px #e91e63;
+}
+.shadow-neon {
+  box-shadow: 0 0 8px 2px #1cb3f7;
 }

@@ -28,6 +28,10 @@ class Room
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'rooms')]
     private $owner;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Game $game = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -77,6 +81,18 @@ class Room
     public function setGameType(string $gameType): static
     {
         $this->gameType = $gameType;
+
+        return $this;
+    }
+
+    public function getGame(): ?Game
+    {
+        return $this->game;
+    }
+
+    public function setGame(?Game $game): static
+    {
+        $this->game = $game;
 
         return $this;
     }
