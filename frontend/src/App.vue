@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import Navigation from './components/Navigation.vue'
+import GlobalChat from './components/GlobalChat.vue'
+import { computed } from 'vue'
+import { useAuthStore } from '@/stores/useAuthStore'
+
+const auth = useAuthStore();
+const isAuthenticated = computed(() => auth.isAuthenticated);
 </script>
 
 <template>
@@ -18,6 +24,9 @@ import Navigation from './components/Navigation.vue'
     </header>
     <main class="relative z-10 px-4">
       <RouterView />
+      <div v-if="isAuthenticated">
+        <GlobalChat />
+      </div>
     </main>
   </div>
 

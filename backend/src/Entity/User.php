@@ -54,7 +54,7 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
      * @var Collection<int, Game>
      */
     #[ORM\ManyToMany(targetEntity: Game::class)]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'game:read'])]
     #[ORM\JoinTable(name: 'user_game')]
     private Collection $favoris;
 

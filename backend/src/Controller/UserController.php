@@ -36,17 +36,18 @@ final class UserController extends AbstractController
         }
 
         return $this->json([
-            'username' => $user->getUserIdentifier(), // ou getUsername() si redéfini
+            'username' => $user->getUserIdentifier(),
             'email' => $user->getEmail(),
             'avatar' => $user->getAvatar(),
+            'roles' => $user->getRoles(),
         ]);
     }
 
-    #[Route('/{id}', name: 'show', methods: ['GET'])]
-    public function show(User $user): JsonResponse
-    {
-        return $this->json($user, 200, [], ['groups' => 'user:read']);
-    }
+    // #[Route('/{id}', name: 'show', methods: ['GET'])]
+    // public function show(User $user): JsonResponse
+    // {
+    //     return $this->json($user, 200, [], ['groups' => 'user:read']);
+    // }
 
     #[Route('/update', name: 'update', methods: ['POST'])]
     public function update(
@@ -60,7 +61,7 @@ final class UserController extends AbstractController
         $user = $security->getUser();
 
         if (!$user instanceof User) {
-            return new JsonResponse(['message' => 'Non authentifiÃ©'], 401);
+            return new JsonResponse(['message' => 'Non authentifié'], 401);
         }
 
         $data = json_decode($request->getContent(), true);
@@ -106,7 +107,7 @@ final class UserController extends AbstractController
             $em->flush();
         }
 
-        // GÃ©nÃ©rer un nouveau token si le username a changÃ©
+        // Générer un nouveau token si le username a changé
         $token = null;
         if ($usernameChanged) {
             $token = $jwtManager->create($user);
@@ -117,6 +118,20 @@ final class UserController extends AbstractController
             'token' => $token,
         ], 200, [], ['groups' => 'user:read']);
     }
+
+    #[Route('/favorites', name: 'favorite_list', methods: ['GET'])]
+    public function myFavorites(Security $security): JsonResponse
+    {
+        $user = $security->getUser();
+
+        if (!$user instanceof User) {
+            return $this->json(['message' => 'Non authentifié'], JsonResponse::HTTP_UNAUTHORIZED);
+        }
+
+        $favorites = $user->getFavoris();
+        return $this->json($favorites, 200, [], ['groups' => 'game:read']);
+    }
+    
     #[Route('/favorites/{id}', name: 'add_favorite', methods: ['POST'])]
     public function addFavorite(
         Security $security,
@@ -134,10 +149,12 @@ final class UserController extends AbstractController
             return $this->json(['message' => 'Jeu non trouvé'], Response::HTTP_NOT_FOUND);
         }
 
-        $user->addFavori($game);
-        $em->flush();
+        if (!$user->getFavoris()->contains($game)) {
+            $user->addFavori($game);
+            $em->flush();
+        }
 
-        return $this->json(['message' => 'Jeu ajouté aux favoris'], Response::HTTP_OK);
+        return $this->json($game, 200, [], ['groups' => 'game:read']);
     }
 
     #[Route('/favorites/{id}', name: 'remove_favorite', methods: ['DELETE'])]
@@ -157,8 +174,10 @@ final class UserController extends AbstractController
             return $this->json(['message' => 'Jeu non trouvé'], Response::HTTP_NOT_FOUND);
         }
 
-        $user->removeFavori($game);
-        $em->flush();
+        if ($user->getFavoris()->contains($game)) {
+            $user->removeFavori($game);
+            $em->flush();
+        }
 
         return $this->json(['message' => 'Jeu retiré des favoris'], Response::HTTP_OK);
     }

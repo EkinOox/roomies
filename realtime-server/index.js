@@ -12,10 +12,12 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log(`🟢 Client connecté : ${socket.id}`);
 
-  socket.on("global-message", (msg) => {
-    console.log(`📨 Message reçu : ${msg}`);
+  // Quand un message est reçu
+  socket.on("chat:message", (msg) => {
+    console.log(`📨 Message reçu de ${msg.user}: ${msg.text}`);
 
-    io.emit("global-message", msg);
+    // Réémission à tout le monde (y compris l'émetteur)
+    io.emit("chat:message", msg);
   });
 
   socket.on("disconnect", () => {

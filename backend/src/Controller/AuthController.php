@@ -60,6 +60,7 @@ final class AuthController extends AbstractController
             $passwordHasher->hashPassword($user, $password)
         );
         $user->setAvatar('img/avatar/10.png');
+        $user->setRoles(['ROLE_USER']);
         $user->setCreatedAt(new \DateTimeImmutable());
 
         $em->persist($user);

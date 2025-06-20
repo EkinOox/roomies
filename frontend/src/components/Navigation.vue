@@ -54,7 +54,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 import Menubar from "primevue/menubar";

@@ -2,77 +2,105 @@
   <div v-if="profile" class="min-h-screen p-6 text-text-light max-w-4xl mx-auto">
 
     <!-- Bienvenue & Avatar -->
-    <section class="flex items-center gap-6 mb-8">
-      <div class="bg-white rounded-full p-1 shadow-md relative">
-        <img :src="avatarPreview || profile.avatar" alt="Avatar" class="w-24 h-24 rounded-full object-cover" />
+    <section
+      class="flex items-center gap-6 mb-10 p-6 rounded-3xl border border-neonPurple/50 bg-[#1c1c2b] shadow-[0_0_20px_rgba(168,85,247,0.3)] animate-pulse-slow">
+      <div class="relative">
+        <img :src="avatarPreview || profile.avatar" alt="Avatar"
+          class="w-24 h-24 rounded-full object-cover border-4 border-neonBlue shadow-[0_0_15px_rgba(0,255,255,0.5)]" />
         <button v-if="isEditing" @click="openAvatarModal"
-          class="absolute bottom-0 right-0 bg-neonPink text-white rounded-full p-1" title="Changer d'avatar">🎨</button>
+          class="absolute bottom-0 right-0 bg-neonPink text-white rounded-full p-1 shadow-[0_0_8px_rgba(255,0,170,0.6)]">
+          🎨
+        </button>
       </div>
       <div>
-        <h1 class="text-4xl font-bold text-neonBlue mb-1">Salut {{ profile.username }},</h1>
-        <p class="text-white text-lg">Nous sommes heureux de te revoir !</p>
+        <h1 class="text-4xl font-extrabold text-neonBlue drop-shadow-[0_0_8px_rgba(0,255,255,0.6)]">
+          Salut {{ profile.username }},
+        </h1>
+        <p class="text-gray-300 text-lg">Bienvenue dans ton espace rétro ✨</p>
       </div>
     </section>
 
     <!-- Modal avatar -->
-    <div v-if="showAvatarModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20">
-      <div class="bg-white p-6 rounded-xl shadow-lg max-w-2xl w-full relative">
+    <div v-if="showAvatarModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+      <div class="bg-[#1f1f2e] p-6 rounded-2xl shadow-[0_0_30px_rgba(255,0,255,0.3)] max-w-2xl w-full relative">
         <h2 class="text-xl font-bold mb-4 text-neonPurple">Choisis ton avatar</h2>
         <div class="grid grid-cols-4 gap-4">
           <img v-for="img in avatarOptions" :key="img" :src="`/img/avatar/${img}`" :alt="img"
-            class="w-20 h-20 rounded-full cursor-pointer border-4" :class="{
-              'border-neonBlue': selectedAvatar === `/img/avatar/${img}`,
+            class="w-20 h-20 rounded-full cursor-pointer border-4 transition duration-300" :class="{
+              'border-neonBlue shadow-[0_0_10px_rgba(0,255,255,0.5)]': selectedAvatar === `/img/avatar/${img}`,
               'border-transparent': selectedAvatar !== `/img/avatar/${img}`
             }" @click="selectAvatar(`/img/avatar/${img}`)" />
         </div>
         <div class="mt-6 flex justify-end gap-4">
-          <button @click="closeAvatarModal" class="px-4 py-2 bg-gray-400 text-white rounded-xl">Annuler</button>
-          <button @click="confirmAvatar" class="px-4 py-2 bg-neonPink text-white rounded-xl">Valider</button>
+          <button @click="closeAvatarModal" class="px-4 py-2 bg-gray-500 text-white rounded-xl">Annuler</button>
+          <button @click="confirmAvatar"
+            class="px-4 py-2 bg-neonPink text-white rounded-xl shadow-[0_0_12px_rgba(255,0,170,0.6)]">Valider</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal d'ajout de jeu favori -->
+    <div v-if="showAddGameModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+      <div class="bg-[#1f1f2e] p-6 rounded-2xl shadow-[0_0_30px_rgba(0,255,255,0.3)] max-w-2xl w-full relative">
+        <h2 class="text-xl font-bold mb-4 text-neonBlue">Ajouter un jeu favori</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
+          <div v-for="game in allGames" :key="game.id"
+            class="border border-neonBlue/30 rounded-lg p-4 cursor-pointer bg-[#2b2b3c] hover:shadow-[0_0_10px_rgba(0,255,255,0.4)] transition"
+            :id="game.id" @click="addFavoriteFromList(game.id)">
+            <img :src="game.image" alt="" class="w-full h-32 object-cover rounded mb-2" />
+            <h3 class="font-semibold text-neonBlue">{{ game.name }}</h3>
+            <p class="text-sm text-gray-400">{{ game.description }}</p>
+          </div>
+        </div>
+        <div class="mt-6 flex justify-end">
+          <button @click="showAddGameModal = false" class="px-4 py-2 bg-gray-500 text-white rounded-xl">Fermer</button>
         </div>
       </div>
     </div>
 
     <!-- Informations personnelles -->
-    <section class="bg-white neon-box p-8 rounded-3xl mb-8">
-      <h2 class="text-2xl font-semibold mb-6 text-neonPurple">Mes Informations</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-base text-color-text">
-
-        <!-- Nom d'utilisateur -->
+    <section class="bg-[#1a1a2e] p-8 rounded-3xl mb-10 border border-neonPink/30 shadow-[0_0_25px_rgba(255,0,170,0.3)]">
+      <h2
+        class="text-3xl font-bold mb-6 text-neonPurple drop-shadow-[0_0_10px_rgba(168,85,247,0.6)] border-b border-neonPurple/30 pb-2">
+        🔐 Mes Informations
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-base text-gray-200">
         <div>
-          <label class="block font-semibold mb-2" for="username">Nom d'utilisateur</label>
-          <div v-if="!isEditing" class="bg-gray-light p-3 rounded-md select-none">{{ profile.username }}</div>
-          <input v-else id="username" v-model="form.username"
-            class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-neonPurple" />
+          <label class="block font-semibold mb-2">Nom d'utilisateur</label>
+          <div v-if="!isEditing" class="bg-[#2d2d44] p-3 rounded-md shadow-inner border border-neonBlue/10 select-none">
+            {{ profile.username }}
+          </div>
+          <input v-else v-model="form.username"
+            class="w-full p-3 rounded-md border border-neonBlue bg-[#1c1c2b] text-white focus:ring-2 focus:ring-neonPurple" />
         </div>
 
-        <!-- Email -->
         <div>
-          <label class="block font-semibold mb-2" for="email">Email</label>
-          <div v-if="!isEditing" class="bg-gray-light p-3 rounded-md select-none">{{ profile.email }}</div>
-          <input v-else id="email" type="email" v-model="form.email"
-            class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-neonPurple" />
+          <label class="block font-semibold mb-2">Email</label>
+          <div v-if="!isEditing" class="bg-[#2d2d44] p-3 rounded-md shadow-inner border border-neonBlue/10 select-none">
+            {{ profile.email }}
+          </div>
+          <input v-else type="email" v-model="form.email"
+            class="w-full p-3 rounded-md border border-neonBlue bg-[#1c1c2b] text-white focus:ring-2 focus:ring-neonPurple" />
         </div>
 
-        <!-- Mot de passe -->
         <div v-if="isEditing">
-          <label class="block font-semibold mb-2" for="password">Nouveau mot de passe</label>
-          <input id="password" type="password" v-model="form.password" placeholder="Laisse vide si inchangé"
-            class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-neonPurple" />
+          <label class="block font-semibold mb-2">Nouveau mot de passe</label>
+          <input type="password" v-model="form.password" placeholder="Laisse vide si inchangé"
+            class="w-full p-3 rounded-md border border-neonBlue bg-[#1c1c2b] text-white" />
         </div>
 
-        <!-- Confirmation -->
         <div v-if="isEditing">
-          <label class="block font-semibold mb-2" for="confirmPassword">Confirmer le mot de passe</label>
-          <input id="confirmPassword" type="password" v-model="confirmPassword"
-            class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-neonPurple" />
+          <label class="block font-semibold mb-2">Confirmer</label>
+          <input type="password" v-model="confirmPassword"
+            class="w-full p-3 rounded-md border border-neonBlue bg-[#1c1c2b] text-white" />
         </div>
       </div>
 
-      <!-- Boutons -->
       <div class="mt-8 flex gap-4">
         <button v-if="!isEditing" @click="enableEdit"
-          class="px-6 py-3 bg-neonPink text-white rounded-xl hover:shadow-pinkGlow transition">Modifier mes
-          informations</button>
+          class="px-6 py-3 bg-neonPink text-white rounded-xl hover:shadow-pinkGlow transition duration-200">
+          Modifier
+        </button>
         <div v-else class="flex gap-4">
           <button @click="submitChanges"
             class="px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition">Enregistrer</button>
@@ -83,57 +111,60 @@
     </section>
 
     <!-- Jeux favoris -->
-    <section class="bg-white neon-box p-8 rounded-3xl">
-      <h2 class="text-2xl font-semibold mb-6 text-neonPurple">Mes Jeux Favoris</h2>
-      <div class="mt-4 mb-6">
-        <button @click="showAddGameModal = true"
-          class="px-4 py-2 bg-neonBlue text-white rounded-xl hover:shadow-blueGlow transition">➕ Ajouter un jeu
-          favori</button>
-      </div>
-      <div v-if="profile.favoris?.length" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div v-for="game in profile.favoris" :key="game.id"
-          class="bg-backgroundLight rounded-xl p-5 shadow-md hover:shadow-neon transition relative">
+
+    <section
+      class="border border-neonBlue/40 rounded-3xl p-8 bg-gradient-to-br from-[#1c1c2b] to-[#111120] shadow-[0_0_30px_rgba(0,255,255,0.15)]">
+      <h2
+        class="text-3xl font-bold mb-6 text-neonPurple drop-shadow-[0_0_10px_rgba(168,85,247,0.6)] border-b border-neonPurple/30 pb-2">
+        🎮 Mes Jeux Favoris
+      </h2>
+
+      <!-- Grid -->
+      <div v-if="favorites.length" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <!-- Cartes de jeux -->
+        <div v-for="game in favorites" :key="game.id"
+          class="relative bg-gradient-to-br from-[#222232] to-[#1b1b2a] text-white rounded-2xl p-5 border border-neonBlue/20 shadow-[0_0_25px_rgba(0,255,255,0.2)] hover:shadow-[0_0_30px_rgba(255,0,255,0.3)] transition duration-300">
+
           <button @click="removeFavorite(game.id)"
-            class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-            title="Retirer des favoris">❌</button>
-          <img :src="game.image" alt="Jeu" class="w-full h-44 object-cover rounded-md mb-4" />
-          <h3 class="text-xl font-semibold text-neonBlue mb-2">{{ game.name }}</h3>
-          <p class="text-sm text-graySoft">{{ game.description }}</p>
+            class="absolute top-3 right-3 bg-gray-300 hover:bg-red-200 text-white p-1 rounded-full shadow-lg transition-transform hover:scale-110"
+            title="Retirer des favoris">
+            ❌
+          </button>
+
+          <img :src="game.image" alt="Image du jeu"
+            class="w-full h-44 object-cover rounded-lg border-2 border-neonBlue/40 shadow-inner mb-4" />
+
+          <h3 class="text-lg font-bold text-neonBlue mb-1 tracking-wide drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]">
+            {{ game.name }}
+          </h3>
+          <p class="text-sm text-gray-300 leading-relaxed">{{ game.description }}</p>
+        </div>
+
+        <!-- Carte "Ajouter un jeu" -->
+        <div @click="showAddGameModal = true"
+          class="flex flex-col items-center justify-center bg-gradient-to-br from-[#141425] to-[#1c1c2b] border border-neonBlue/30 hover:border-neonPink text-white rounded-2xl p-5 cursor-pointer shadow-[0_0_15px_rgba(0,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,0,255,0.3)] transition duration-300 group">
+          <div
+            class="text-5xl mb-2 text-neonBlue group-hover:text-neonPink transition duration-200 drop-shadow-[0_0_6px_rgba(0,255,255,0.5)]">
+            ➕
+          </div>
+          <p class="text-center text-sm text-gray-300 group-hover:text-white">
+            Ajouter un nouveau jeu favori
+          </p>
         </div>
       </div>
-      <p v-else class="text-graySoft text-sm italic">Tu n’as pas encore de jeux favoris.</p>
+
+      <!-- Message vide + bouton en dessous si aucun favori -->
+      <div v-else class="text-center">
+        <p class="text-gray-400 italic mt-6 mb-6">Tu n’as pas encore de jeux favoris.</p>
+        <button @click="showAddGameModal = true"
+          class="px-6 py-3 bg-neonBlue text-white font-semibold rounded-xl shadow-[0_0_12px_rgba(0,255,255,0.6)] hover:shadow-[0_0_20px_rgba(0,255,255,0.8)] transition-all duration-200">
+          ➕ Ajouter un jeu
+        </button>
+      </div>
     </section>
-
-    <!-- Modal d'ajout de jeu favori -->
-    <div v-if="showAddGameModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20">
-      <div class="bg-white p-6 rounded-xl shadow-lg max-w-2xl w-full relative">
-        <h2 class="text-xl font-bold mb-4 text-neonPurple">Ajouter un jeu favori</h2>
-        <div class="grid grid-cols-1 gap-4">
-          <div>
-            <label class="block font-semibold mb-1">Nom du jeu</label>
-            <input v-model="newGame.name" class="w-full p-2 border border-gray-300 rounded-md"
-              placeholder="Nom du jeu" />
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Description</label>
-            <textarea v-model="newGame.description" class="w-full p-2 border border-gray-300 rounded-md"
-              placeholder="Brève description"></textarea>
-          </div>
-          <div>
-            <label class="block font-semibold mb-1">Image (URL)</label>
-            <input v-model="newGame.image" class="w-full p-2 border border-gray-300 rounded-md"
-              placeholder="https://..." />
-          </div>
-        </div>
-        <div class="mt-6 flex justify-end gap-4">
-          <button @click="showAddGameModal = false" class="px-4 py-2 bg-gray-400 text-white rounded-xl">Annuler</button>
-          <button @click="addFavorite" class="px-4 py-2 bg-neonBlue text-white rounded-xl">Ajouter</button>
-        </div>
-      </div>
-    </div>
-
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted } from 'vue'
@@ -153,22 +184,34 @@ const selectedAvatar = ref(null)
 const avatarOptions = Array.from({ length: 9 }, (_, i) => `${i + 1}.png`)
 const showAddGameModal = ref(false)
 
-const newGame = ref({
-  name: '',
-  description: '',
-  image: ''
-})
+const allGames = ref([])
+const favorites = ref([])
 
+const fetchProfile = async () => {
+  const { data } = await axios.get('http://localhost:8000/api/users/profile', {
+    headers: { Authorization: `Bearer ${auth.token}` }
+  })
+  profile.value = data
+  console.log('Profil chargé:', profile.value)
+  auth.setUser(data)
+}
 
 onMounted(async () => {
   try {
-    const { data } = await axios.get('http://localhost:8000/api/users/profile', {
+    await fetchProfile()
+
+    const { data: gamesData } = await axios.get('http://localhost:8000/api/games', {
       headers: { Authorization: `Bearer ${auth.token}` }
     })
-    profile.value = data
-    auth.setUser(data)
+    allGames.value = gamesData
+
+    const { data: favData } = await axios.get('http://localhost:8000/api/users/favorites', {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    })
+    favorites.value = favData
+
   } catch (err) {
-    console.error('Erreur chargement profil :', err)
+    console.error('Erreur lors du chargement :', err)
   }
 })
 
@@ -231,34 +274,40 @@ const confirmAvatar = () => {
   closeAvatarModal()
 }
 
-const removeFavorite = async (gameId) => {
+const addFavoriteFromList = async (gameId) => {
   try {
-    await axios.delete(`http://localhost:8000/api/users/favorites/${gameId}`, {
+    await axios.post(`http://localhost:8000/api/users/favorites/${gameId}`, {}, {
       headers: { Authorization: `Bearer ${auth.token}` }
     })
-    profile.value.favoris = profile.value.favoris.filter((g) => g.id !== gameId)
-  } catch (err) {
-    console.error("Erreur retrait favori :", err)
-    alert("Impossible de retirer ce jeu des favoris.")
-  }
-}
 
-const addFavorite = async () => {
-  if (!newGame.value.name || !newGame.value.image) {
-    alert('Le nom et l’image du jeu sont obligatoires.')
-    return
-  }
-
-  try {
-    const { data } = await axios.post('http://localhost:8000/api/users/favorites', newGame.value, {
+    const { data: favData } = await axios.get('http://localhost:8000/api/users/favorites', {
       headers: { Authorization: `Bearer ${auth.token}` }
     })
-    profile.value.favoris.push(data)
-    newGame.value = { name: '', description: '', image: '' }
+    favorites.value = favData
+
     showAddGameModal.value = false
   } catch (err) {
     console.error('Erreur ajout favori :', err)
     alert('Impossible d’ajouter ce jeu aux favoris.')
   }
 }
+
+
+const removeFavorite = async (gameId) => {
+  try {
+    await axios.delete(`http://localhost:8000/api/users/favorites/${gameId}`, {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    })
+
+    // Rechargement des favoris depuis l'API
+    const { data: favData } = await axios.get('http://localhost:8000/api/users/favorites', {
+      headers: { Authorization: `Bearer ${auth.token}` }
+    })
+    favorites.value = favData
+  } catch (err) {
+    console.error("Erreur retrait favori :", err)
+    alert("Impossible de retirer ce jeu des favoris.")
+  }
+}
+
 </script>
