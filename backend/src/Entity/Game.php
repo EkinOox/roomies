@@ -18,11 +18,11 @@ class Game
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['game:read', 'user:read'])]
+    #[Groups(['game:read', 'user:read', 'room:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['game:read', 'user:read'])]
+    #[Groups(['game:read', 'user:read', 'room:read'])]
     private ?string $image = null;
     
     #[ORM\Column(type: 'text', nullable: true)]

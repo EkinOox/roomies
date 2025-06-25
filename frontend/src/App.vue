@@ -4,6 +4,10 @@ import Navigation from './components/Navigation.vue'
 import GlobalChat from './components/GlobalChat.vue'
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/useAuthStore'
+import { socket } from '@/plugins/socket'
+
+socket.connect()
+
 
 const auth = useAuthStore();
 const isAuthenticated = computed(() => auth.isAuthenticated);
@@ -32,6 +36,7 @@ const isAuthenticated = computed(() => auth.isAuthenticated);
 
 
 </template>
+
 
 <style scoped>
 @keyframes float {

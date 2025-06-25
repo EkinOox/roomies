@@ -1,19 +1,6 @@
-import socket from "../services/socket";
+// src/plugins/socket.ts
+import { io } from 'socket.io-client'
 
-export default {
-  install: (app) => {
-    socket.connect();
-
-    // Optionnel : gestion des évènements globaux
-    socket.on("connect", () => {
-      console.log("Socket connecté :", socket.id);
-    });
-
-    socket.on("disconnect", () => {
-      console.log("Socket déconnecté");
-    });
-
-    app.config.globalProperties.$socket = socket;
-    app.provide("socket", socket);
-  },
-};
+export const socket = io('http://localhost:3000', {
+  autoConnect: false,
+})

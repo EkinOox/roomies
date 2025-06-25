@@ -17,7 +17,7 @@ class GameFixtures extends Fixture
                 'description' => 'Un jeu de puzzle où vous combinez des tuiles pour atteindre 2048.',
             ],
             [
-                'name' => 'Morpion',
+                'name' => 'morpion',
                 'image' => 'img/games/morpion.png',
                 'description' => 'Le célèbre jeu de Tic-Tac-Toe pour deux joueurs.',
             ],

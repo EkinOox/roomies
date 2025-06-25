@@ -57,6 +57,8 @@
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
+import Vue3Toastify, { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 const email = ref('')
 const username = ref('')
@@ -78,6 +80,7 @@ const register = async () => {
     email.value = ''
     username.value = ''
     password.value = ''
+    toast.success("Inscription réussie !")
   } catch (e) {
   console.log('Erreur Axios:', e.response);
 
@@ -87,6 +90,7 @@ const register = async () => {
     error.value = e.response.data
   } else {
     error.value = "Erreur lors de l'inscription"
+    toast.error("Erreur lors de l'inscription")
   }
 }
 

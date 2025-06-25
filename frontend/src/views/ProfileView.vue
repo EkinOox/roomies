@@ -1,6 +1,5 @@
 <template>
   <div v-if="profile" class="min-h-screen p-6 text-text-light max-w-4xl mx-auto">
-
     <!-- Bienvenue & Avatar -->
     <section
       class="flex items-center gap-6 mb-10 p-6 rounded-3xl border border-neonPurple/50 bg-[#1c1c2b] shadow-[0_0_20px_rgba(168,85,247,0.3)] animate-pulse-slow">
@@ -39,30 +38,15 @@
       </div>
     </div>
 
-    <!-- Modal d'ajout de jeu favori -->
-    <div v-if="showAddGameModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-      <div class="bg-[#1f1f2e] p-6 rounded-2xl shadow-[0_0_30px_rgba(0,255,255,0.3)] max-w-2xl w-full relative">
-        <h2 class="text-xl font-bold mb-4 text-neonBlue">Ajouter un jeu favori</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
-          <div v-for="game in allGames" :key="game.id"
-            class="border border-neonBlue/30 rounded-lg p-4 cursor-pointer bg-[#2b2b3c] hover:shadow-[0_0_10px_rgba(0,255,255,0.4)] transition"
-            :id="game.id" @click="addFavoriteFromList(game.id)">
-            <img :src="game.image" alt="" class="w-full h-32 object-cover rounded mb-2" />
-            <h3 class="font-semibold text-neonBlue">{{ game.name }}</h3>
-            <p class="text-sm text-gray-400">{{ game.description }}</p>
-          </div>
-        </div>
-        <div class="mt-6 flex justify-end">
-          <button @click="showAddGameModal = false" class="px-4 py-2 bg-gray-500 text-white rounded-xl">Fermer</button>
-        </div>
-      </div>
-    </div>
+    <!-- Modal Ajout Jeu Favori -->
+    <FavoriteModal v-if="showAddGameModal" :games="allGames" @add="addFavoriteFromList"
+      @close="showAddGameModal = false" />
 
-    <!-- Informations personnelles -->
+    <!-- Infos Perso -->
     <section class="bg-[#1a1a2e] p-8 rounded-3xl mb-10 border border-neonPink/30 shadow-[0_0_25px_rgba(255,0,170,0.3)]">
       <h2
         class="text-3xl font-bold mb-6 text-neonPurple drop-shadow-[0_0_10px_rgba(168,85,247,0.6)] border-b border-neonPurple/30 pb-2">
-        🔐 Mes Informations
+        🔝 Mes Informations
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-base text-gray-200">
         <div>
@@ -110,66 +94,58 @@
       </div>
     </section>
 
-    <!-- Jeux favoris -->
-
+    <!-- Favoris -->
     <section
       class="border border-neonBlue/40 rounded-3xl p-8 bg-gradient-to-br from-[#1c1c2b] to-[#111120] shadow-[0_0_30px_rgba(0,255,255,0.15)]">
       <h2
         class="text-3xl font-bold mb-6 text-neonPurple drop-shadow-[0_0_10px_rgba(168,85,247,0.6)] border-b border-neonPurple/30 pb-2">
         🎮 Mes Jeux Favoris
       </h2>
-
-      <!-- Grid -->
       <div v-if="favorites.length" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <!-- Cartes de jeux -->
         <div v-for="game in favorites" :key="game.id"
           class="relative bg-gradient-to-br from-[#222232] to-[#1b1b2a] text-white rounded-2xl p-5 border border-neonBlue/20 shadow-[0_0_25px_rgba(0,255,255,0.2)] hover:shadow-[0_0_30px_rgba(255,0,255,0.3)] transition duration-300">
-
           <button @click="removeFavorite(game.id)"
             class="absolute top-3 right-3 bg-gray-300 hover:bg-red-200 text-white p-1 rounded-full shadow-lg transition-transform hover:scale-110"
             title="Retirer des favoris">
             ❌
           </button>
-
           <img :src="game.image" alt="Image du jeu"
             class="w-full h-44 object-cover rounded-lg border-2 border-neonBlue/40 shadow-inner mb-4" />
-
           <h3 class="text-lg font-bold text-neonBlue mb-1 tracking-wide drop-shadow-[0_0_5px_rgba(0,255,255,0.5)]">
             {{ game.name }}
           </h3>
           <p class="text-sm text-gray-300 leading-relaxed">{{ game.description }}</p>
         </div>
 
-        <!-- Carte "Ajouter un jeu" -->
         <div @click="showAddGameModal = true"
-          class="flex flex-col items-center justify-center bg-gradient-to-br from-[#141425] to-[#1c1c2b] border border-neonBlue/30 hover:border-neonPink text-white rounded-2xl p-5 cursor-pointer shadow-[0_0_15px_rgba(0,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,0,255,0.3)] transition duration-300 group">
+          class="flex flex-col justify-center items-center border border-dashed border-neonBlue hover:bg-[#1e293b] transition rounded-xl p-6 text-neonBlue">
           <div
             class="text-5xl mb-2 text-neonBlue group-hover:text-neonPink transition duration-200 drop-shadow-[0_0_6px_rgba(0,255,255,0.5)]">
-            ➕
+            <i class="pi pi-plus-circle text-5xl mb-2"></i>
           </div>
           <p class="text-center text-sm text-gray-300 group-hover:text-white">
             Ajouter un nouveau jeu favori
           </p>
         </div>
       </div>
-
-      <!-- Message vide + bouton en dessous si aucun favori -->
       <div v-else class="text-center">
         <p class="text-gray-400 italic mt-6 mb-6">Tu n’as pas encore de jeux favoris.</p>
         <button @click="showAddGameModal = true"
-          class="px-6 py-3 bg-neonBlue text-white font-semibold rounded-xl shadow-[0_0_12px_rgba(0,255,255,0.6)] hover:shadow-[0_0_20px_rgba(0,255,255,0.8)] transition-all duration-200">
-          ➕ Ajouter un jeu
+          class="flex flex-col justify-center items-center border border-dashed border-neonBlue hover:bg-[#1e293b] transition rounded-xl p-6 text-neonBlue">
+          <i class="pi pi-plus-circle text-3xl mb-2"></i>
+          <span>Ajouter un jeu</span>
         </button>
       </div>
     </section>
   </div>
 </template>
 
-
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from '../stores/useAuthStore'
+import FavoriteModal from '@/components/FavoriteModal.vue'
+import Vue3Toastify, { toast } from 'vue3-toastify'
 
 const auth = useAuthStore()
 
@@ -177,29 +153,26 @@ const profile = ref(null)
 const isEditing = ref(false)
 const form = ref({ username: '', email: '', password: '' })
 const confirmPassword = ref('')
-
 const avatarPreview = ref(null)
 const showAvatarModal = ref(false)
 const selectedAvatar = ref(null)
 const avatarOptions = Array.from({ length: 9 }, (_, i) => `${i + 1}.png`)
 const showAddGameModal = ref(false)
-
 const allGames = ref([])
 const favorites = ref([])
+
 
 const fetchProfile = async () => {
   const { data } = await axios.get('http://localhost:8000/api/users/profile', {
     headers: { Authorization: `Bearer ${auth.token}` }
   })
   profile.value = data
-  console.log('Profil chargé:', profile.value)
   auth.setUser(data)
 }
 
 onMounted(async () => {
   try {
     await fetchProfile()
-
     const { data: gamesData } = await axios.get('http://localhost:8000/api/games', {
       headers: { Authorization: `Bearer ${auth.token}` }
     })
@@ -209,7 +182,6 @@ onMounted(async () => {
       headers: { Authorization: `Bearer ${auth.token}` }
     })
     favorites.value = favData
-
   } catch (err) {
     console.error('Erreur lors du chargement :', err)
   }
@@ -235,10 +207,9 @@ const cancelEdit = () => {
 
 const submitChanges = async () => {
   if (form.value.password && form.value.password !== confirmPassword.value) {
-    alert('Les mots de passe ne correspondent pas.')
+    toast.error('Les mots de passe ne correspondent pas.')
     return
   }
-
   const payload = {
     username: form.value.username,
     email: form.value.email,
@@ -257,9 +228,10 @@ const submitChanges = async () => {
     profile.value = data.user
     isEditing.value = false
     avatarPreview.value = null
+    toast.success('Profil mis à jour avec succès !')
   } catch (err) {
     console.error('Erreur mise à jour profil :', err)
-    alert("Échec de la mise à jour du profil.")
+    toast.error("Échec de la mise à jour du profil.")
   }
 }
 
@@ -279,35 +251,31 @@ const addFavoriteFromList = async (gameId) => {
     await axios.post(`http://localhost:8000/api/users/favorites/${gameId}`, {}, {
       headers: { Authorization: `Bearer ${auth.token}` }
     })
-
     const { data: favData } = await axios.get('http://localhost:8000/api/users/favorites', {
       headers: { Authorization: `Bearer ${auth.token}` }
     })
     favorites.value = favData
-
     showAddGameModal.value = false
+    toast.success('Jeu ajouté aux favoris.')
   } catch (err) {
     console.error('Erreur ajout favori :', err)
-    alert('Impossible d’ajouter ce jeu aux favoris.')
+    toast.error('Impossible d’ajouter ce jeu aux favoris.')
   }
 }
-
 
 const removeFavorite = async (gameId) => {
   try {
     await axios.delete(`http://localhost:8000/api/users/favorites/${gameId}`, {
       headers: { Authorization: `Bearer ${auth.token}` }
     })
-
-    // Rechargement des favoris depuis l'API
     const { data: favData } = await axios.get('http://localhost:8000/api/users/favorites', {
       headers: { Authorization: `Bearer ${auth.token}` }
     })
     favorites.value = favData
+    toast.success('Jeu retiré des favoris.')
   } catch (err) {
     console.error("Erreur retrait favori :", err)
-    alert("Impossible de retirer ce jeu des favoris.")
+    toast.error("Impossible de retirer ce jeu des favoris.")
   }
 }
-
 </script>

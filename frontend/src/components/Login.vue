@@ -49,6 +49,8 @@ import { ref } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/useAuthStore'
+import Vue3Toastify, { toast } from 'vue3-toastify'
+import 'vue3-toastify/dist/index.css'
 
 const email = ref('')
 const password = ref('')
@@ -77,17 +79,17 @@ const login = async () => {
       },
     })
 
-    // On met à jour le store avec les données utilisateur (dont l'avatar)
     auth.setUser(profileResponse.data)
 
     success.value = true
     email.value = ''
     password.value = ''
-
+    toast.success("Vous êtes connecté !")
     // Enfin, on redirige
     router.push('/')
   } catch (e) {
     error.value = e.response?.data?.message || 'Identifiants invalides'
+    toast.error("Identifiants invalides")
   }
 }
 

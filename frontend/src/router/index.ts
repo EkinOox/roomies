@@ -2,6 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import AuthView from '../views/AuthView.vue'
 import ProfileView from '../views/ProfileView.vue'
+import RoomList from '../views/RoomListView.vue'
+import Room from '../views/RoomView.vue'
+import { useAuthStore } from '@/stores/useAuthStore'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,22 +26,38 @@ const router = createRouter({
       component: ProfileView,
       meta: { requiresAuth: true },
     },
+    {
+      path: '/rooms',
+      name: 'RoomList',
+      component: RoomList,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/rooms/:id',
+      name: 'RoomView',
+      component: Room,
+      meta: { requiresAuth: true },
+    },
   ],
 })
 
 // Guard global
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
+  const auth = useAuthStore()
 
+  // Redirection si connecté et sur la page /auth
   if (to.name === 'auth' && token) {
-    next({ name: 'home' })
-  } else {
-    next()
+    return next({ name: 'home' })
   }
 
-  if (to.meta.requiresAuth && !token) {
-    next({ name: 'auth' })
+  // Redirection si non connecté et route protégée
+  if (to.meta.requiresAuth && (!auth.token || auth.isTokenExpired())) {
+    auth.logout()
+    return next({ name: 'auth' })
   }
+
+  next()
 })
 
 export default router

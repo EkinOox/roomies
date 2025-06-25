@@ -43,12 +43,6 @@ final class UserController extends AbstractController
         ]);
     }
 
-    // #[Route('/{id}', name: 'show', methods: ['GET'])]
-    // public function show(User $user): JsonResponse
-    // {
-    //     return $this->json($user, 200, [], ['groups' => 'user:read']);
-    // }
-
     #[Route('/update', name: 'update', methods: ['POST'])]
     public function update(
         Request $request,
@@ -116,7 +110,7 @@ final class UserController extends AbstractController
         return $this->json([
             'user' => $user,
             'token' => $token,
-        ], 200, [], ['groups' => 'user:read']);
+        ], 200, [], ['groups' => ['user:read', 'game:read']]);
     }
 
     #[Route('/favorites', name: 'favorite_list', methods: ['GET'])]

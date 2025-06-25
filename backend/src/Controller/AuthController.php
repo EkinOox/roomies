@@ -87,6 +87,7 @@ final class AuthController extends AbstractController
         }
 
         $token = $jwtManager->createFromPayload($user, [
+            'id' => $user->getId(),
             'roles' => $user->getRoles(),
             'avatar' => $user->getAvatar(),
             'email' => $user->getEmail(),

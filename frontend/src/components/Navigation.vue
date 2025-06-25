@@ -67,11 +67,7 @@ const auth = useAuthStore();
 
 const isAuthenticated = computed(() => auth.isAuthenticated);
 
-const userAvatar = computed(() => auth.avatar ?? "/img/avatar/10.png");
-
-watch(() => auth.avatar, (newVal) => {
-  console.log("Avatar mis à jour :", newVal);
-});
+const userAvatar = computed(() => auth.avatar);
 
 const items = ref([
   {
@@ -84,9 +80,9 @@ const items = ref([
     icon: "pi pi-users",
     badge: 2,
     items: [
-      { label: "Toutes les rooms", icon: "pi pi-pencil" },
+      { label: "Toutes les rooms", icon: "pi pi-pencil", command: () => router.push("/rooms") },
       { separator: true },
-      { label: "2048", icon: "pi pi-bolt", command: () => router.push("/jeux") },
+      { label: "2048", icon: "pi pi-bolt", command: () => router.push("/rooms") },
       { label: "Morpion", icon: "pi pi-server" },
     ],
   },
