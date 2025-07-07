@@ -1,11 +1,11 @@
 
 <template>
   <div class="flex flex-col items-center justify-center w-full h-full">
-    <h3 class="text-2xl font-bold mb-6 text-neonBlue">♟️ Jeu d'échecs</h3>
+    <h3 class="text-2xl font-bold mb-6 text-neonBlue">Jeu d'échecs</h3>
     <div class="bg-[#1e293b] p-4 rounded-xl border border-neonBlue shadow-[4px_4px_10px_#000000,-4px_-4px_10px_#ffffff20]">
-      <Chessboard :position="fen" @drop="onDrop" board-style="width: 100%; max-width: 400px;" />
+      <TheChessboard :position="fen" @drop="onDrop" board-style="width: 100%; max-width: 400px;" />
     </div>
-    <p v-if="gameOver" class="mt-4 text-lg text-red-400 font-bold">🛑 Partie terminée</p>
+    <p v-if="gameOver" class="mt-4 text-lg text-red-400 font-bold">Partie terminée</p>
     <button
       v-if="gameOver"
       @click="resetGame"
@@ -19,7 +19,7 @@
 <script setup>
 import { ref } from 'vue'
 import { Chess } from 'chess.js'
-import { Chessboard } from 'vue3-chessboard'
+import { TheChessboard } from 'vue3-chessboard'
 import 'vue3-chessboard/style.css'
 
 const game = new Chess()
