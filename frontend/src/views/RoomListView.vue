@@ -1,12 +1,12 @@
 <template>
   <div class="p-8 text-white">
-    <h2 class="text-3xl font-bold mb-6">🎮 Toutes les Rooms</h2>
-
+    <h2 class="text-3xl font-bold mb-6">
+      🎮 Rooms {{ route.params.slug ? `du jeu ${route.params.slug}` : 'disponibles' }}
+    </h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
       <div v-for="room in rooms" :key="room.id"
         class="bg-gradient-to-br from-[#1f1f2e] to-[#1a1a2e] p-5 rounded-2xl shadow-[0_0_15px_rgba(0,255,255,0.1)] border border-neonBlue/20 hover:shadow-[0_0_30px_rgba(168,85,247,0.3)] transition-all duration-300 relative">
-        <img :src="room.game?.image" :alt="room.game?.name"
-          class="w-full h-32 object-cover rounded-lg border border-neonBlue/20 mb-4" />
+        <img :src="room.game?.image" :alt="room.game?.name" class="w-full h-32 object-cover rounded-lg border border-neonBlue/20 mb-4" />
         <h3 class="text-xl font-bold text-neonPurple mb-1">{{ room.name }}</h3>
         <p class="text-sm text-gray-400 mb-1"><i class="pi pi-user mr-1"></i> Créateur : {{ room.owner?.username }}</p>
         <p class="text-sm text-gray-400 mb-1">
@@ -35,6 +35,10 @@
         <i class="pi pi-plus-circle text-3xl mb-2"></i>
         <span>Créer une Room</span>
       </button>
+
+      <div v-if="rooms.length === 0" class="mt-10 text-center text-gray-400 col-span-full">
+        😕 Aucune room disponible pour ce jeu.
+      </div>
     </div>
 
     <!-- Modal de création -->
@@ -60,7 +64,7 @@
           </div>
         </div>
 
-        <input v-model.number="newRoom.maxPlayers" type="number" min="2" max="10" placeholder="Nombre max de joueurs"
+        <input v-model.number="newRoom.maxPlayers" type="number" min="1" max="10" placeholder="Nombre max de joueurs"
           class="w-full p-2 rounded bg-[#1e293b] text-white outline-none focus:ring-2 focus:ring-neonBlue" />
 
         <div class="flex justify-end gap-2">
@@ -109,12 +113,14 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { io } from 'socket.io-client'
 import { useAuthStore } from '@/stores/useAuthStore'
-import Vue3Toastify, { toast } from 'vue3-toastify'
+import { toast } from 'vue3-toastify'
 import 'vue3-toastify/dist/index.css'
+import { useRoute } from 'vue-router'
 import { watch } from 'vue'
 
 const auth = useAuthStore()
 const socket = io('http://localhost:3000')
+const route = useRoute()
 
 const rooms = ref([])
 const games = ref([])
@@ -155,22 +161,25 @@ const updateRoom = async (roomId) => {
 socket.on("room:update", ({ roomId, participantsCount }) => {
   const index = rooms.value.findIndex(r => r.id === roomId)
   if (index !== -1) {
-    if (participantsCount !== undefined) {
-      rooms.value[index].participants = Array(participantsCount).fill({})
-    } else {
       updateRoom(roomId)
     }
-  }
 })
 
 
 
 async function fetchRooms() {
+  const slug = route.params.slug
+
   const res = await axios.get('http://localhost:8000/api/rooms', {
     headers: { Authorization: `Bearer ${auth.token}` },
   })
-  rooms.value = res.data
+
+  const allRooms = res.data
+  rooms.value = slug
+    ? allRooms.filter(r => r.game?.name?.toLowerCase() === slug.toLowerCase())
+    : allRooms
 }
+
 
 async function fetchGames() {
   const res = await axios.get('http://localhost:8000/api/games', {
@@ -198,7 +207,7 @@ async function createRoom() {
       },
     })
 
-    newRoom.value = { name: '', game: '', maxPlayers: 2 }
+    newRoom.value = { name: '', game: '', maxPlayers: 1 }
     selectedGameSlug.value = ''
     modalOpen.value = false
     await fetchRooms()
@@ -236,6 +245,10 @@ watch(() => auth.userId, (newVal) => {
   if (newVal) {
     fetchRooms()
   }
+})
+
+watch(() => route.params.slug, () => {
+  fetchRooms()
 })
 
 function canDeleteRoom(room) {

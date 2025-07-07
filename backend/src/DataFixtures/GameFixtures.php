@@ -13,17 +13,17 @@ class GameFixtures extends Fixture
         $games = [
             [
                 'name' => '2048',
-                'image' => 'img/games/2048.png',
+                'image' => '/img/games/2048.png',
                 'description' => 'Un jeu de puzzle où vous combinez des tuiles pour atteindre 2048.',
             ],
             [
                 'name' => 'morpion',
-                'image' => 'img/games/morpion.png',
+                'image' => '/img/games/morpion.png',
                 'description' => 'Le célèbre jeu de Tic-Tac-Toe pour deux joueurs.',
             ],
             [
                 'name' => 'echecs',
-                'image' => 'img/games/echecs.png',
+                'image' => '/img/games/echecs.png',
                 'description' => 'Jeu de stratégie classique opposant deux joueurs sur un damier.',
             ],
         ];

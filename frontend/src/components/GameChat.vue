@@ -1,6 +1,6 @@
 <template>
   <div class="w-full h-full bg-[#0f172a]/90 border border-neonBlue/30 rounded-xl shadow-xl flex flex-col overflow-hidden">
-    <!-- En-tête -->
+    <!-- En-tÃªte -->
     <div class="bg-neonBlue/20 text-neonBlue px-4 py-3 font-bold flex justify-between items-center">
       <span><i class="pi pi-comments"></i> Chat de la partie</span>
     </div>
@@ -44,7 +44,7 @@
         @keydown.enter="sendMessage"
         :disabled="!canSend"
         class="flex-1 bg-[#1e293b] text-white text-sm px-3 py-2 rounded-l-md outline-none disabled:opacity-50"
-        placeholder="Écris ton message..."
+        placeholder="écris ton message..."
       />
       <button
         @click="sendMessage"
