@@ -1,6 +1,5 @@
 services:
   frontend:
-    image: frontend
     build:
       context: ./frontend
     ports:
@@ -18,7 +17,6 @@ services:
         condition: on-failure
 
   backend:
-    image: backend
     build:
       context: ./backend
     ports:
