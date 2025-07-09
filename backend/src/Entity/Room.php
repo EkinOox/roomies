@@ -13,10 +13,11 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[UniqueEntity('name', message: 'Ce nom de room est déjà utilisé.')]
 class Room
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    #[Groups(['room:read'])]
+
+    #[ORM\Id] // Indique que ce champ est la clé primaire (Primary Key) de l'entité
+    #[ORM\GeneratedValue]// Précise que la valeur de ce champ est générée automatiquement (auto-incrémentée)
+    #[ORM\Column]// Définit ce champ comme une colonne de la base de données (type auto-détecté, généralement INTEGER pour une ID)
+    #[Groups(['room:read'])]  // Spécifie que ce champ doit être exposé dans la sérialisation quand on utilise le groupe 'room:read' / Utile par exemple dans les API JSON, pour contrôler quels champs sont visibles dans chaque contexte
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]

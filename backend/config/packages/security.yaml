@@ -1,25 +1,31 @@
 security:
+  # Configuration du hachage des mots de passe
   password_hashers:
     App\Entity\User:
-      algorithm: auto
+      algorithm: auto  # Utilise automatiquement le meilleur algorithme disponible (ex: bcrypt, sodium...)
 
+
+  # Configuration du provider d'utilisateurs (comment récupérer les users depuis la BDD)
   providers:
     app_user_provider:
       entity:
-        class: App\Entity\User
-        property: username
+        class: App\Entity\User       # Entité utilisée pour les utilisateurs
+        property: username           # Champ utilisé pour identifier l'utilisateur (login via le champ `username`)
 
+  # Définition des "firewalls", qui sont des couches de sécurité appliquées à certaines routes
   firewalls:
     dev:
-      pattern: ^/(_(profiler|wdt)|css|images|js)/
-      security: false
-      
-    api:
-      pattern: ^/api
-      stateless: true
-      jwt: ~
+      pattern: ^/(_(profiler|wdt)|css|images|js)/  # Exclut certaines routes (profiler Symfony, ressources statiques)
+      security: false                              # Pas de sécurité sur ces routes (accessible à tous)
 
+    api:
+      pattern: ^/api             # Ce firewall s'applique à toutes les routes commençant par /api
+      stateless: true            # Pas de session, pas de cookie (parfait pour une API RESTful)
+      jwt: ~                     # Utilise l'authentification via JWT (nécessite LexikJWTAuthenticationBundle)
+
+
+  # Règles d'accès selon les rôles et les routes
   access_control:
-    - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-    - { path: ^/register$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-    - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+    - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }     # Tout le monde peut accéder à /login
+    - { path: ^/register$, roles: IS_AUTHENTICATED_ANONYMOUSLY }  # Tout le monde peut accéder à /register
+    - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }              # L’accès à /api nécessite un utilisateur entièrement authentifié (JWT valide)

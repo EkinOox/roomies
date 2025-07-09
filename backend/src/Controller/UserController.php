@@ -17,22 +17,35 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use App\Repository\GameRepository;
 
+/**
+ * Contrôleur de gestion des utilisateurs - Profil, favoris, mise à jour
+ * Toutes les routes sont préfixées par /api/users et protégées par authentification JWT
+ */
 #[Route('/api/users', name: 'api_users_')]
 final class UserController extends AbstractController
 {
+    /**
+     * Liste tous les utilisateurs (pour administration ou recherche)
+     * Attention : à sécuriser selon les besoins métier
+     */
     #[Route('/', name: 'list', methods: ['GET'])]
     public function list(UserRepository $userRepository): JsonResponse
     {
         return $this->json($userRepository->findAll(), 200, [], ['groups' => 'user:read']);
     }
 
+    /**
+     * Récupère le profil de l'utilisateur connecté
+     * Utilisé pour afficher les informations personnelles dans l'interface
+     */
     #[Route('/profile', name: 'api_me', methods: ['GET'])]
     public function Profile(Security $security): JsonResponse
     {
+        // Récupère l'utilisateur connecté depuis le token JWT
         $user = $security->getUser();
 
         if (!$user instanceof User) {
-            return $this->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+            return $this->json(['error' => 'Utilisateur non connecté'], 401);
         }
 
         return $this->json([
@@ -50,14 +63,15 @@ final class UserController extends AbstractController
         EntityManagerInterface $em,
         UserPasswordHasherInterface $passwordHasher,
         ValidatorInterface $validator,
-        JWTTokenManagerInterface $jwtManager
+        JWTTokenManagerInterface $jwtManager // Service pour créer des tokens JWT
     ): JsonResponse {
-        $user = $security->getUser();
-
+        // Récupère l'utilisateur connecté
+        $user = $this->getUser();
         if (!$user instanceof User) {
-            return new JsonResponse(['message' => 'Non authentifié'], 401);
+            return $this->json(['error' => 'Utilisateur non connecté'], 401);
         }
 
+        // Décode les nouvelles données envoyées
         $data = json_decode($request->getContent(), true);
 
         $username = $data['username'] ?? null;
@@ -79,7 +93,7 @@ final class UserController extends AbstractController
             $emailConstraint->message = 'Email invalide.';
             $errors = $validator->validate($email, $emailConstraint);
             if (count($errors) > 0) {
-                return new JsonResponse(['message' => (string) $errors], 400);
+                return $this->json(['error' => 'Email invalide'], 400);
             }
             $user->setEmail($email);
             $hasChanged = true;
@@ -113,6 +127,10 @@ final class UserController extends AbstractController
         ], 200, [], ['groups' => ['user:read', 'game:read']]);
     }
 
+    /**
+     * Liste les jeux favoris de l'utilisateur connecté
+     * Utilisé pour afficher la section "Mes Favoris" du profil
+     */
     #[Route('/favorites', name: 'favorite_list', methods: ['GET'])]
     public function myFavorites(Security $security): JsonResponse
     {
@@ -122,10 +140,13 @@ final class UserController extends AbstractController
             return $this->json(['message' => 'Non authentifié'], JsonResponse::HTTP_UNAUTHORIZED);
         }
 
+        // Récupère les jeux favoris de l'utilisateur
         $favorites = $user->getFavoris();
+
+        // Retourne la liste des favoris
         return $this->json($favorites, 200, [], ['groups' => 'game:read']);
     }
-    
+
     #[Route('/favorites/{id}', name: 'add_favorite', methods: ['POST'])]
     public function addFavorite(
         Security $security,
@@ -151,28 +172,41 @@ final class UserController extends AbstractController
         return $this->json($game, 200, [], ['groups' => 'game:read']);
     }
 
+    // Annotation de route : définit une route HTTP DELETE sur /favorites/{id}
+    // Elle appelle cette méthode pour retirer un jeu des favoris d'un utilisateur connecté
     #[Route('/favorites/{id}', name: 'remove_favorite', methods: ['DELETE'])]
     public function removeFavorite(
-        Security $security,
-        GameRepository $gameRepository,
-        int $id,
-        EntityManagerInterface $em
+        Security $security,                   // Service pour accéder à l'utilisateur connecté
+        GameRepository $gameRepository,      // Repository pour accéder aux jeux dans la base
+        int $id,                              // Identifiant du jeu à retirer des favoris (passé dans l'URL)
+        EntityManagerInterface $em           // Gestionnaire d'entité Doctrine pour effectuer des opérations en base
     ): JsonResponse {
+
+        // Récupération de l'utilisateur actuellement connecté
         $user = $security->getUser();
+
+        // Vérification que l'utilisateur est bien authentifié et de type User
         if (!$user instanceof User) {
             return $this->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
 
+        // Recherche du jeu correspondant à l'identifiant passé en paramètre
         $game = $gameRepository->find($id);
+
+        // Si aucun jeu n'est trouvé, on retourne une erreur 404
         if (!$game) {
             return $this->json(['message' => 'Jeu non trouvé'], Response::HTTP_NOT_FOUND);
         }
 
+        // Vérifie si le jeu est bien dans la liste des favoris de l'utilisateur
         if ($user->getFavoris()->contains($game)) {
+            // Si oui, on le retire des favoris
             $user->removeFavori($game);
+            // On sauvegarde les modifications en base de données
             $em->flush();
         }
 
+        // On retourne une réponse JSON indiquant que le jeu a bien été retiré des favoris
         return $this->json(['message' => 'Jeu retiré des favoris'], Response::HTTP_OK);
     }
 }
