@@ -128,13 +128,14 @@ const items = ref([
   {
     label: "Rooms",
     icon: "pi pi-users",
-    icone: "pi pi-pencil", badge: '3',
+    icone: "pi pi-pencil", badge: '4',
     items: [
       { label: "Toutes les rooms", command: () => router.push("/rooms") },
       { separator: true },
       { label: "2048", icon: "pi pi-bolt", command: () => router.push("/rooms/game/2048") },
       { label: "Morpion", icon: "pi pi-server", command: () => router.push("/rooms/game/morpion") },
       { label: "Échec", icon: "pi pi-server", command: () => router.push("/rooms/game/echecs") },
+      { label: "Quizz", icon: "pi pi-question-circle", command: () => router.push("/rooms/game/quizz") },
     ],
   },
   {

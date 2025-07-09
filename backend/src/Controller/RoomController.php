@@ -76,16 +76,28 @@ class RoomController extends AbstractController
 
     /**
      * Supprime une room par son ID
-     * Attention : suppression définitive, à sécuriser selon les droits
+     * Seul le propriétaire de la room peut la supprimer
      */
     #[Route('/{id}', name: 'delete_room', methods: ['DELETE'])]
-    public function deleteRoom(int $id, EntityManagerInterface $em): JsonResponse
+    public function deleteRoom(int $id, EntityManagerInterface $em, TokenStorageInterface $tokenStorage): JsonResponse
     {
         // Recherche la room par son ID
         $room = $em->getRepository(Room::class)->find($id);
 
         if (!$room) {
             return $this->json(['error' => 'Room not found'], 404);
+        }
+
+        // Récupère l'utilisateur connecté
+        /** @var User $currentUser */
+        $currentUser = $tokenStorage->getToken()?->getUser();
+        if (!$currentUser) {
+            return $this->json(['error' => 'Utilisateur non authentifié'], 401);
+        }
+
+        // Vérifie que l'utilisateur connecté est le propriétaire de la room
+        if ($room->getOwner()->getId() !== $currentUser->getId()) {
+            return $this->json(['error' => 'Seul le propriétaire peut supprimer cette room'], 403);
         }
 
         // Supprime définitivement la room

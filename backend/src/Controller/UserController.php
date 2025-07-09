@@ -49,7 +49,8 @@ final class UserController extends AbstractController
         }
 
         return $this->json([
-            'username' => $user->getUserIdentifier(),
+            'id' => $user->getId(),
+            'username' => $user->getUsername(),
             'email' => $user->getEmail(),
             'avatar' => $user->getAvatar(),
             'roles' => $user->getRoles(),
@@ -66,9 +67,10 @@ final class UserController extends AbstractController
         JWTTokenManagerInterface $jwtManager // Service pour créer des tokens JWT
     ): JsonResponse {
         // Récupère l'utilisateur connecté
-        $user = $this->getUser();
+        $user = $security->getUser();
+        
         if (!$user instanceof User) {
-            return $this->json(['error' => 'Utilisateur non connecté'], 401);
+            return $this->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
         }
 
         // Décode les nouvelles données envoyées
@@ -93,7 +95,7 @@ final class UserController extends AbstractController
             $emailConstraint->message = 'Email invalide.';
             $errors = $validator->validate($email, $emailConstraint);
             if (count($errors) > 0) {
-                return $this->json(['error' => 'Email invalide'], 400);
+                return new JsonResponse(['message' => (string) $errors], 400);
             }
             $user->setEmail($email);
             $hasChanged = true;
@@ -115,16 +117,28 @@ final class UserController extends AbstractController
             $em->flush();
         }
 
-        // Générer un nouveau token si le username a changé
+        // Générer un nouveau token à chaque fois qu'il y a une modification
+        // pour que le frontend ait les données à jour (avatar, email, etc.)
         $token = null;
-        if ($usernameChanged) {
-            $token = $jwtManager->create($user);
+        if ($hasChanged) {
+            $token = $jwtManager->createFromPayload($user, [
+                'id' => $user->getId(),
+                'roles' => $user->getRoles(),
+                'avatar' => $user->getAvatar(),
+                'email' => $user->getEmail(),
+            ]);
         }
 
         return $this->json([
-            'user' => $user,
+            'user' => [
+                'id' => $user->getId(),
+                'username' => $user->getUsername(),
+                'email' => $user->getEmail(),
+                'avatar' => $user->getAvatar(),
+                'roles' => $user->getRoles(),
+            ],
             'token' => $token,
-        ], 200, [], ['groups' => ['user:read', 'game:read']]);
+        ], 200);
     }
 
     /**
