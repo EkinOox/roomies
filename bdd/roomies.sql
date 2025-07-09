@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : mysql
--- Généré le : jeu. 19 juin 2025 à 17:53
+-- Généré le : jeu. 19 juin 2025 à 12:53
 -- Version du serveur : 8.0.42
 -- Version de PHP : 8.2.27
 
@@ -41,30 +41,7 @@ INSERT INTO `doctrine_migration_versions` (`version`, `executed_at`, `execution_
 ('DoctrineMigrations\\Version20250521082600', '2025-06-16 09:29:15', 125),
 ('DoctrineMigrations\\Version20250618154835', '2025-06-18 15:49:03', 377),
 ('DoctrineMigrations\\Version20250618161147', '2025-06-18 16:12:16', 236),
-('DoctrineMigrations\\Version20250618164642', '2025-06-18 16:46:52', 82),
-('DoctrineMigrations\\Version20250619131436', '2025-06-19 13:14:38', 346),
-('DoctrineMigrations\\Version20250619151116', '2025-06-19 15:11:41', 139),
-('DoctrineMigrations\\Version20250619172748', '2025-06-19 17:27:54', 83);
-
--- --------------------------------------------------------
-
---
--- Structure de la table `friendship`
---
-
-CREATE TABLE `friendship` (
-  `id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `friend_id` int NOT NULL,
-  `status` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `friendship`
---
-
-INSERT INTO `friendship` (`id`, `user_id`, `friend_id`, `status`) VALUES
-(1, 4, 2, 'accepted');
+('DoctrineMigrations\\Version20250618164642', '2025-06-18 16:46:52', 82);
 
 -- --------------------------------------------------------
 
@@ -107,17 +84,6 @@ CREATE TABLE `room` (
 -- --------------------------------------------------------
 
 --
--- Structure de la table `room_user`
---
-
-CREATE TABLE `room_user` (
-  `room_id` int NOT NULL,
-  `user_id` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
 -- Structure de la table `user`
 --
 
@@ -127,17 +93,27 @@ CREATE TABLE `user` (
   `username` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` datetime NOT NULL COMMENT '(DC2Type:datetime_immutable)',
-  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `roles` json NOT NULL
+  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `user`
 --
 
-INSERT INTO `user` (`id`, `email`, `username`, `password`, `created_at`, `avatar`, `roles`) VALUES
-(2, 'admin@admin.com', 'admintest', '$2y$13$LH6fjs6d97rcpUVEMcAEYeahnw8HRG/rGKbmaBSANAwYhtcyU6JUm', '2025-06-18 16:13:20', '/img/avatar/5.png', '[\"ROLE_USER\", \"ROLE_ADMIN\"]'),
-(4, 'test@test.com', 'EkinOox', '$2y$13$SPqU3Zd7jSoCQ/Ctcxr.cuKwI8pVmeJrj3FBERyBenwlhmOwjDUgi', '2025-06-19 06:50:21', '/img/avatar/1.png', '[\"ROLE_USER\"]');
+INSERT INTO `user` (`id`, `email`, `username`, `password`, `created_at`, `avatar`) VALUES
+(2, 'admin@admin.com', 'admintest', '$2y$13$LH6fjs6d97rcpUVEMcAEYeahnw8HRG/rGKbmaBSANAwYhtcyU6JUm', '2025-06-18 16:13:20', '/img/avatar/5.png'),
+(4, 'test@test.com', 'EkinOox', '$2y$13$SPqU3Zd7jSoCQ/Ctcxr.cuKwI8pVmeJrj3FBERyBenwlhmOwjDUgi', '2025-06-19 06:50:21', '/img/avatar/1.png');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `user_friends`
+--
+
+CREATE TABLE `user_friends` (
+  `user_id` int NOT NULL,
+  `friend_id` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -169,14 +145,6 @@ ALTER TABLE `doctrine_migration_versions`
   ADD PRIMARY KEY (`version`);
 
 --
--- Index pour la table `friendship`
---
-ALTER TABLE `friendship`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `IDX_7234A45FA76ED395` (`user_id`),
-  ADD KEY `IDX_7234A45F6A5458E8` (`friend_id`);
-
---
 -- Index pour la table `game`
 --
 ALTER TABLE `game`
@@ -192,20 +160,20 @@ ALTER TABLE `room`
   ADD KEY `IDX_729F519BE48FD905` (`game_id`);
 
 --
--- Index pour la table `room_user`
---
-ALTER TABLE `room_user`
-  ADD PRIMARY KEY (`room_id`,`user_id`),
-  ADD KEY `IDX_EE973C2D54177093` (`room_id`),
-  ADD KEY `IDX_EE973C2DA76ED395` (`user_id`);
-
---
 -- Index pour la table `user`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `UNIQ_8D93D649E7927C74` (`email`),
   ADD UNIQUE KEY `UNIQ_8D93D649F85E0677` (`username`);
+
+--
+-- Index pour la table `user_friends`
+--
+ALTER TABLE `user_friends`
+  ADD PRIMARY KEY (`user_id`,`friend_id`),
+  ADD KEY `IDX_79E36E63A76ED395` (`user_id`),
+  ADD KEY `IDX_79E36E636A5458E8` (`friend_id`);
 
 --
 -- Index pour la table `user_game`
@@ -218,12 +186,6 @@ ALTER TABLE `user_game`
 --
 -- AUTO_INCREMENT pour les tables déchargées
 --
-
---
--- AUTO_INCREMENT pour la table `friendship`
---
-ALTER TABLE `friendship`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT pour la table `game`
@@ -248,13 +210,6 @@ ALTER TABLE `user`
 --
 
 --
--- Contraintes pour la table `friendship`
---
-ALTER TABLE `friendship`
-  ADD CONSTRAINT `FK_7234A45F6A5458E8` FOREIGN KEY (`friend_id`) REFERENCES `user` (`id`),
-  ADD CONSTRAINT `FK_7234A45FA76ED395` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
-
---
 -- Contraintes pour la table `room`
 --
 ALTER TABLE `room`
@@ -262,11 +217,11 @@ ALTER TABLE `room`
   ADD CONSTRAINT `FK_729F519BE48FD905` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`);
 
 --
--- Contraintes pour la table `room_user`
+-- Contraintes pour la table `user_friends`
 --
-ALTER TABLE `room_user`
-  ADD CONSTRAINT `FK_EE973C2D54177093` FOREIGN KEY (`room_id`) REFERENCES `room` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `FK_EE973C2DA76ED395` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE;
+ALTER TABLE `user_friends`
+  ADD CONSTRAINT `FK_79E36E636A5458E8` FOREIGN KEY (`friend_id`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `FK_79E36E63A76ED395` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`);
 
 --
 -- Contraintes pour la table `user_game`
