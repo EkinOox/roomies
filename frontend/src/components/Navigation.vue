@@ -117,33 +117,51 @@ const auth = useAuthStore()
 // Computed pour savoir si utilisateur est connecté et récupérer son avatar
 const isAuthenticated = computed(() => auth.isAuthenticated)
 const userAvatar = computed(() => auth.avatar)
+const isAdmin = computed(() => auth.isAdmin)
+
+console.log('Roles:', auth.roles)
+console.log('Is Admin:', isAdmin.value)
 
 // Menu principal avec labels, icônes, et commandes de navigation
-const items = ref([
-  {
-    label: "Accueil",
-    icon: "pi pi-home",
-    command: () => router.push("/")
-  },
-  {
-    label: "Rooms",
-    icon: "pi pi-users",
-    icone: "pi pi-pencil", badge: '4',
-    items: [
-      { label: "Toutes les rooms", command: () => router.push("/rooms") },
-      { separator: true },
-      { label: "2048", icon: "pi pi-bolt", command: () => router.push("/rooms/game/2048") },
-      { label: "Morpion", icon: "pi pi-server", command: () => router.push("/rooms/game/morpion") },
-      { label: "Échec", icon: "pi pi-server", command: () => router.push("/rooms/game/echecs") },
-      { label: "Quizz", icon: "pi pi-question-circle", command: () => router.push("/rooms/game/quizz") },
-    ],
-  },
-  {
-    label: "Contact",
-    icon: "pi pi-envelope",
-    command: () => router.push("/contact")
+const items = computed(() => {
+  const baseItems = [
+    {
+      label: "Accueil",
+      icon: "pi pi-home",
+      command: () => router.push("/")
+    },
+    {
+      label: "Rooms",
+      icon: "pi pi-users",
+      icone: "pi pi-pencil",
+      badge: '4',
+      items: [
+        { label: "Toutes les rooms", command: () => router.push("/rooms") },
+        { separator: true },
+        { label: "2048", icon: "pi pi-bolt", command: () => router.push("/rooms/game/2048") },
+        { label: "Morpion", icon: "pi pi-server", command: () => router.push("/rooms/game/morpion") },
+        { label: "Échec", icon: "pi pi-server", command: () => router.push("/rooms/game/echecs") },
+        { label: "Quizz", icon: "pi pi-question-circle", command: () => router.push("/rooms/game/quizz") },
+      ],
+    },
+    {
+      label: "Contact",
+      icon: "pi pi-envelope",
+      command: () => router.push("/contact")
+    }
+  ]
+
+  // Ajouter l'item administration si l'utilisateur est admin et connecté
+  if (isAuthenticated.value && isAdmin.value) {
+    baseItems.splice(-1, 0, {
+      label: "Administration",
+      icon: "pi pi-cog",
+      command: () => router.push("/admin")
+    })
   }
-])
+
+  return baseItems
+})
 
 // États réactifs pour la recherche
 const searchQuery = ref('')

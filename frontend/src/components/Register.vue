@@ -44,14 +44,16 @@
       Inscription réussie !
     </p>
   </form>
+
+  <Toast position="top-right" />
 </template>
 
 <script setup>
 // Import des fonctions nécessaires
 import { ref } from 'vue'
 import axios from 'axios'
-import { toast } from 'vue3-toastify'  // Import toast pour notifications
-import 'vue3-toastify/dist/index.css'
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast'
 
 // Variables réactives pour stocker les données du formulaire et états
 const email = ref('')
@@ -59,6 +61,7 @@ const username = ref('')
 const password = ref('')
 const error = ref('')
 const success = ref(false)
+const toast = useToast()
 
 // Fonction asynchrone appelée lors de la soumission du formulaire
 const register = async () => {
@@ -79,7 +82,11 @@ const register = async () => {
     email.value = ''
     username.value = ''
     password.value = ''
-    toast.success("Inscription réussie !")
+    toast.add({
+      severity: 'success',
+      summary: 'Succès',
+      detail: 'Inscription réussie '
+    })
   } catch (e) {
     // Debug en console si erreur axios
     console.log('Erreur Axios:', e.response);
@@ -91,7 +98,11 @@ const register = async () => {
       error.value = e.response.data
     } else {
       error.value = "Erreur lors de l'inscription"
-      toast.error("Erreur lors de l'inscription")
+      toast.add({
+        severity: 'error',
+        summary: 'Erreur',
+        detail: "Erreur lors de l'inscription",
+      })
     }
   }
 }

@@ -19,12 +19,12 @@
     </php>
 
     <testsuites>
-        <!-- Tests unitaires des services et entitÃ©s -->
+        <!-- Tests unitaires des services et entités -->
         <testsuite name="Unit">
             <directory>tests/Unit</directory>
         </testsuite>
         
-        <!-- Tests d'intÃ©gration des contrÃ©leurs -->
+        <!-- Tests d'intégration des contrôleurs -->
         <testsuite name="Integration">
             <directory>tests/Integration</directory>
         </testsuite>

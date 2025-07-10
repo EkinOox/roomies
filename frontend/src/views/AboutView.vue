@@ -1,3 +1,23 @@
+<template>
+  <div class="p-4">
+    <!-- Titre du chat -->
+    <h2 class="text-xl font-bold mb-2">Chat Global</h2>
+
+    <!-- Liste des messages reçus -->
+    <ul class="mb-2">
+      <!-- Affichage de chaque message avec une clé unique -->
+      <li v-for="(msg, index) in messages" :key="index">{{ msg }}</li>
+    </ul>
+
+    <!-- Champ de saisie du message, lié à la variable `input` -->
+    <!-- Envoi du message à la touche Entrée -->
+    <input v-model="input" class="border p-1" @keyup.enter="sendMessage" placeholder="Tape un message" />
+
+    <!-- Bouton pour envoyer le message -->
+    <button @click="sendMessage" class="bg-blue-500 text-white px-2 py-1 ml-2">Envoyer</button>
+  </div>
+</template>
+
 <script setup>
 import { inject, ref, onMounted } from 'vue';
 
@@ -30,22 +50,3 @@ const sendMessage = () => {
 };
 </script>
 
-<template>
-  <div class="p-4">
-    <!-- Titre du chat -->
-    <h2 class="text-xl font-bold mb-2">Chat Global</h2>
-
-    <!-- Liste des messages reçus -->
-    <ul class="mb-2">
-      <!-- Affichage de chaque message avec une clé unique -->
-      <li v-for="(msg, index) in messages" :key="index">{{ msg }}</li>
-    </ul>
-
-    <!-- Champ de saisie du message, lié à la variable `input` -->
-    <!-- Envoi du message à la touche Entrée -->
-    <input v-model="input" class="border p-1" @keyup.enter="sendMessage" placeholder="Tape un message" />
-
-    <!-- Bouton pour envoyer le message -->
-    <button @click="sendMessage" class="bg-blue-500 text-white px-2 py-1 ml-2">Envoyer</button>
-  </div>
-</template>

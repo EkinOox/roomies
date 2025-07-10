@@ -43,6 +43,8 @@
       Connexion réussie !
     </p>
   </form>
+
+   <Toast position="top-right" />
 </template>
 
 <script setup>
@@ -50,14 +52,15 @@ import { ref } from 'vue'              // Import des refs réactives de Vue
 import axios from 'axios'              // Import axios pour requêtes HTTP
 import { useRouter } from 'vue-router'// Import pour navigation programmatique
 import { useAuthStore } from '@/stores/useAuthStore' // Store de gestion auth
-import { toast } from 'vue3-toastify' // Notifications toast
-import 'vue3-toastify/dist/index.css' // Styles toast
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast'
 
 // Variables réactives liées au formulaire
 const email = ref('')
 const password = ref('')
 const error = ref('')
 const success = ref(false)
+const toast = useToast()
 
 // Accès au router pour naviguer
 const router = useRouter()
@@ -96,14 +99,21 @@ const login = async () => {
     // Reset champs formulaire
     email.value = ''
     password.value = ''
-    // Notification succès
-    toast.success("Vous êtes connecté !")
+    toast.add({
+        severity: 'success',
+        summary: 'Succès',
+        detail: 'Vous êtes connecté !'
+      })
     // Redirection vers la page d'accueil
     router.push('/')
   } catch (e) {
     // Gestion des erreurs : message d'erreur API ou message générique
     error.value = e.response?.data?.message || 'Identifiants invalides'
-    toast.error("Identifiants invalides")
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: "Identifiants invalides",
+    })
   }
 }
 </script>

@@ -54,7 +54,7 @@
           <div v-if="!isEditing" class="bg-[#2d2d44] p-3 rounded-md shadow-inner border border-neonBlue/10 select-none">
             {{ profile.username }}
           </div>
-          <input v-else v-model="form.username"
+          <input v-else v-model="form.username" placeholder="Nom d'utilisateur"
             class="w-full p-3 rounded-md border border-neonBlue bg-[#1c1c2b] text-white focus:ring-2 focus:ring-neonPurple" />
         </div>
 
@@ -124,7 +124,7 @@
             <i class="pi pi-plus-circle text-5xl mb-2"></i>
           </div>
           <p class="text-center text-sm text-gray-300 group-hover:text-white">
-            Ajouter un nouveau jeu favori
+            Ajouter un nouveau jeu favoris
           </p>
         </div>
       </div>
@@ -138,6 +138,8 @@
       </div>
     </section>
   </div>
+
+  <Toast position="top-right" />
 </template>
 
 <script setup>
@@ -145,7 +147,8 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useAuthStore } from '../stores/useAuthStore'
 import FavoriteModal from '@/components/FavoriteModal.vue'
-import Vue3Toastify, { toast } from 'vue3-toastify'
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast'
 
 const auth = useAuthStore()
 
@@ -160,7 +163,7 @@ const avatarOptions = Array.from({ length: 9 }, (_, i) => `${i + 1}.png`)
 const showAddGameModal = ref(false)
 const allGames = ref([])
 const favorites = ref([])
-
+const toast = useToast()
 
 const fetchProfile = async () => {
   const { data } = await axios.get('http://localhost:8000/api/users/profile', {
@@ -207,7 +210,11 @@ const cancelEdit = () => {
 
 const submitChanges = async () => {
   if (form.value.password && form.value.password !== confirmPassword.value) {
-    toast.error('Les mots de passe ne correspondent pas.')
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: "Les mots de passe ne correspondent pas.",
+    })
     return
   }
   const payload = {
@@ -228,10 +235,18 @@ const submitChanges = async () => {
     profile.value = data.user
     isEditing.value = false
     avatarPreview.value = null
-    toast.success('Profil mis à jour avec succès !')
+    toast.add({
+      severity: 'success',
+      summary: 'Succès',
+      detail: 'Profil mis à jour avec succès !'
+    })
   } catch (err) {
     console.error('Erreur mise à jour profil :', err)
-    toast.error("Échec de la mise à jour du profil.")
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: "Échec de la mise à jour du profil.",
+    })
   }
 }
 
@@ -256,10 +271,18 @@ const addFavoriteFromList = async (gameId) => {
     })
     favorites.value = favData
     showAddGameModal.value = false
-    toast.success('Jeu ajouté aux favoris.')
+    toast.add({
+      severity: 'success',
+      summary: 'Succès',
+      detail: 'Jeu ajouté aux favoris.'
+    })
   } catch (err) {
     console.error('Erreur ajout favori :', err)
-    toast.error('Impossible d’ajouter ce jeu aux favoris.')
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: "Impossible d’ajouter ce jeu aux favoris.",
+    })
   }
 }
 
@@ -272,10 +295,18 @@ const removeFavorite = async (gameId) => {
       headers: { Authorization: `Bearer ${auth.token}` }
     })
     favorites.value = favData
-    toast.success('Jeu retiré des favoris.')
+    toast.add({
+        severity: 'success',
+        summary: 'Succès',
+        detail: 'Jeu retiré des favoris.'
+      })
   } catch (err) {
     console.error("Erreur retrait favori :", err)
-    toast.error("Impossible de retirer ce jeu des favoris.")
+     toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: "Impossible de retirer ce jeu des favoris.",
+    })
   }
 }
 </script>

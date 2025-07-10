@@ -36,6 +36,14 @@ class Room
     #[Groups(['room:read'])]
     private ?string $gameType = null;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Groups(['room:read'])]
+    private ?string $description = null;
+
+    #[ORM\Column(length: 50)]
+    #[Groups(['room:read'])]
+    private ?string $status = 'waiting';
+
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'rooms')]
     #[Groups(['room:read'])]
     private $owner;
@@ -114,6 +122,30 @@ class Room
         return $this;
     }
 
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
     public function getGame(): ?Game
     {
         return $this->game;
@@ -130,6 +162,14 @@ class Room
      * @return Collection<int, User>
      */
     public function getParticipants(): Collection
+    {
+        return $this->participants;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getPlayers(): Collection
     {
         return $this->participants;
     }

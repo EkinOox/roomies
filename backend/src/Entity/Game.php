@@ -21,7 +21,7 @@ class Game
     #[Groups(['game:read', 'user:read', 'room:read'])]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(nullable: true, length: 255)]
     #[Groups(['game:read', 'user:read', 'room:read'])]
     private ?string $image = null;
     

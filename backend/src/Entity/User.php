@@ -44,6 +44,10 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
   #[Groups(['user:read'])]
   private ?\DateTimeImmutable $createdAt = null;
 
+  #[ORM\Column(nullable: true)]
+  #[Groups(['user:read'])]
+  private ?\DateTimeImmutable $lastActive = null;
+
   #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Room::class)]
   private Collection $rooms;
 
@@ -141,6 +145,17 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
     return $this;
   }
 
+  public function getLastActive(): ?\DateTimeImmutable
+  {
+    return $this->lastActive;
+  }
+
+  public function setLastActive(?\DateTimeImmutable $lastActive): static
+  {
+    $this->lastActive = $lastActive;
+    return $this;
+  }
+
   public function getRoles(): array
   {
     $roles = $this->roles;
@@ -153,11 +168,10 @@ class User implements PasswordAuthenticatedUserInterface, UserInterface
     // Nettoyer les donn�es sensibles temporaires si besoin
   }
 
-  public function getUserIdentifier(): string
-  {
-    return (string) $this->username;
-  }
-
+    public function getUserIdentifier(): string
+    {
+        return $this->email ?? "";
+    }
   public function getRooms(): Collection
   {
     return $this->rooms;

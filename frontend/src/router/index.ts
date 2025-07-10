@@ -4,6 +4,7 @@ import AuthView from '../views/AuthView.vue'
 import ProfileView from '../views/ProfileView.vue'
 import RoomList from '../views/RoomListView.vue'
 import Room from '../views/RoomView.vue'
+import AdminView from '@/views/AdminView.vue'
 import ContactView from '@/views/ContactView.vue'
 import { useAuthStore } from '@/stores/useAuthStore'
 
@@ -44,6 +45,12 @@ const router = createRouter({
       name: 'roomsByGame',
       component: RoomList,
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: AdminView,
+      meta: { requiresAuth: true, requiresAdmin: true },
     },
     {
       path: '/contact',

@@ -16,6 +16,21 @@ class RoomRepository extends ServiceEntityRepository
         parent::__construct($registry, Room::class);
     }
 
+    /**
+     * Récupère toutes les rooms avec leurs détails (owner, game, participants)
+     */
+    public function findAllWithDetails(): array
+    {
+        return $this->createQueryBuilder('r')
+            ->leftJoin('r.owner', 'o')
+            ->leftJoin('r.game', 'g')
+            ->leftJoin('r.participants', 'p')
+            ->addSelect('o', 'g', 'p')
+            ->orderBy('r.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Room[] Returns an array of Room objects
     //     */

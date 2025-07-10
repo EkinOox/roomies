@@ -10,6 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
   const username = ref<string | null>(null)
   const email = ref<string | null>(null)
   const avatar = ref<string | null>(null)
+  const roles = ref<string[]>([]) // Ajout des r�les
 
   function setToken(newToken: string | null) {
     token.value = newToken
@@ -25,6 +26,7 @@ export const useAuthStore = defineStore('auth', () => {
         username.value = payload.username
         email.value = payload.email
         avatar.value = payload.avatar
+        roles.value = payload.roles || [] // Extraction des r�les du token
       } catch (e) {
         console.error('Erreur de décodage du token JWT :', e)
         logout()
@@ -35,6 +37,7 @@ export const useAuthStore = defineStore('auth', () => {
       email.value = null
       userId.value = null
       avatar.value = null
+      roles.value = [] // Reset des r�les
     }
   }
 
@@ -54,6 +57,8 @@ export const useAuthStore = defineStore('auth', () => {
     username.value = null
     email.value = null
     userId.value = null
+    avatar.value = null
+    roles.value = [] // Reset des r�les
   }
 
   function isTokenExpired(): boolean {
@@ -70,6 +75,11 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  // Computed pour v�rifier si l'utilisateur est admin
+  const isAdmin = computed(() => {
+    return roles.value.includes('ROLE_ADMIN')
+  })
+
   return {
     token,
     isAuthenticated,
@@ -77,6 +87,8 @@ export const useAuthStore = defineStore('auth', () => {
     email,
     avatar,
     userId,
+    roles, // Exposition des r�les
+    isAdmin, // Exposition du computed isAdmin
     setToken,
     setUser,
     setAvatar,

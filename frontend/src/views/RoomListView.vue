@@ -6,7 +6,8 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
       <div v-for="room in rooms" :key="room.id"
         class="bg-gradient-to-br from-[#1f1f2e] to-[#1a1a2e] p-5 rounded-2xl shadow-[0_0_15px_rgba(0,255,255,0.1)] border border-neonBlue/20 hover:shadow-[0_0_30px_rgba(168,85,247,0.3)] transition-all duration-300 relative">
-        <img :src="room.game?.image" :alt="room.game?.name" class="w-full h-32 object-cover rounded-lg border border-neonBlue/20 mb-4" />
+        <img :src="room.game?.image" :alt="room.game?.name"
+          class="w-full h-32 object-cover rounded-lg border border-neonBlue/20 mb-4" />
         <h3 class="text-xl font-bold text-neonPurple mb-1">{{ room.name }}</h3>
         <p class="text-sm text-gray-400 mb-1"><i class="pi pi-user mr-1"></i> Créateur : {{ room.owner?.username }}</p>
         <p class="text-sm text-gray-400 mb-1">
@@ -106,6 +107,8 @@
       </div>
     </div>
   </div>
+
+  <Toast position="top-right" />
 </template>
 
 <script setup>
@@ -113,10 +116,10 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { io } from 'socket.io-client'
 import { useAuthStore } from '@/stores/useAuthStore'
-import { toast } from 'vue3-toastify'
-import 'vue3-toastify/dist/index.css'
 import { useRoute } from 'vue-router'
 import { watch } from 'vue'
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast'
 
 const auth = useAuthStore()
 const socket = io('http://localhost:3000')
@@ -128,6 +131,7 @@ const selectedGameSlug = ref('')
 const modalOpen = ref(false)
 const showDeleteModal = ref(false)
 const roomToDelete = ref(null)
+const toast = useToast()
 
 const newRoom = ref({
   name: '',
@@ -161,8 +165,8 @@ const updateRoom = async (roomId) => {
 socket.on("room:update", ({ roomId, participantsCount }) => {
   const index = rooms.value.findIndex(r => r.id === roomId)
   if (index !== -1) {
-      updateRoom(roomId)
-    }
+    updateRoom(roomId)
+  }
 })
 
 
@@ -195,7 +199,11 @@ onMounted(() => {
 
 async function createRoom() {
   if (!newRoom.value.name || !newRoom.value.game || !newRoom.value.maxPlayers) {
-    toast.warning("Merci de remplir tous les champs.")
+    toast.add({
+      severity: 'warn',
+      summary: 'Attention',
+      detail: 'Merci de remplir tous les champs.'
+    })
     return
   }
 
@@ -216,7 +224,11 @@ async function createRoom() {
     const msg = err.response?.data?.error
       ?? err.response?.data?.violations?.[0]?.message
       ?? "Ce nom de room est déjà pris"
-    toast.info(msg)
+    toast.add({
+      severity: 'info',
+      summary: 'Info',
+      detail: msg
+    })
   }
 }
 
@@ -237,7 +249,11 @@ async function confirmDeleteRoom() {
     roomToDelete.value = null
   } catch (err) {
     console.error('Erreur suppression room:', err)
-    toast.error("Impossible de supprimer cette room.")
+    toast.add({
+      severity: 'error',
+      summary: 'Erreur',
+      detail: "Impossible de supprimer cette room.",
+    })
   }
 }
 

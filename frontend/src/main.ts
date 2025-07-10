@@ -7,9 +7,10 @@ import App from './App.vue'
 import router from './router'
 import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura'
-import Vue3Toastify, { toast } from 'vue3-toastify'
-import 'vue3-toastify/dist/index.css'
 import { useAuthStore } from '@/stores/useAuthStore'
+import Tooltip from 'primevue/tooltip'
+import ToastService from 'primevue/toastservice'
+import ConfirmationService from 'primevue/confirmationservice'
 
 const app = createApp(App)
 
@@ -24,18 +25,10 @@ app.use(PrimeVue, {
     },
   },
 })
-app.use(Vue3Toastify, {
-  position: 'top-right',
-  timeout: 3000,
-  closeOnClick: true,
-  pauseOnHover: true,
-  draggable: true,
-  showCloseButtonOnHover: false,
-  hideProgressBar: false,
-  closeButton: 'button',
-  icon: true,
-})
 app.use(router)
+app.use(ToastService)
+app.use(ConfirmationService)
+app.directive('tooltip', Tooltip)
 const auth = useAuthStore()
 if (auth.token) {
   auth.setToken(auth.token)
