@@ -13,12 +13,8 @@
             </small>
           </h1>
           <div class="flex items-center gap-4">
-            <button
-              @click="loadData"
-              :disabled="loadingUsers || loadingRooms"
-              title="Actualiser"
-              class="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-full disabled:opacity-50 transition-colors duration-200"
-            >
+            <button @click="loadData" :disabled="loadingUsers || loadingRooms" title="Actualiser"
+              class="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-full disabled:opacity-50 transition-colors duration-200">
               <i class="pi pi-refresh" :class="{ 'animate-spin': loadingUsers || loadingRooms }"></i>
             </button>
           </div>
@@ -106,66 +102,44 @@
               <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4
                           bg-slate-700/50 p-4 rounded-xl border border-white/10">
                 <div class="flex gap-3 items-center flex-wrap">
-                  <Button
-                    label="Nouvel Utilisateur"
-                    icon="pi pi-plus"
-                    @click="openUserDialog()"
-                    class="bg-gradient-to-r from-neonBlue to-purple-600 hover:from-neonBlue/80 hover:to-purple-600/80
-                           border-0 shadow-lg transition-all duration-300"
-                  />
-                  <Button
-                    label="Exporter CSV"
-                    icon="pi pi-download"
-                    severity="secondary"
-                    @click="exportUsers"
-                    class="shadow-md"
-                  />
-                  <Button
-                    label="Importer"
-                    icon="pi pi-upload"
-                    severity="help"
-                    @click="() => {}"
-                    class="shadow-md"
-                  />
+                  <Button label="Nouvel Utilisateur" icon="pi pi-plus" @click="openUserDialog()" class="bg-gradient-to-r from-neonBlue to-purple-600 hover:from-neonBlue/80 hover:to-purple-600/80
+                           border-0 shadow-lg transition-all duration-300" />
+                  <Button label="Exporter CSV" icon="pi pi-download" severity="secondary" @click="exportUsers"
+                    class="shadow-md" />
+                  <Button label="Importer" icon="pi pi-upload" severity="help" @click="() => { }" class="shadow-md" />
                 </div>
 
                 <div class="flex gap-3 items-center flex-wrap">
                   <div class="relative">
                     <i class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    <InputText
-                      v-model="userSearch"
-                      placeholder="Rechercher un utilisateur..."
-                      class="pl-10 w-64 bg-slate-800/50 border-white/20"
-                    />
+                    <InputText v-model="userSearch" placeholder="Rechercher un utilisateur..."
+                      class="pl-10 w-64 bg-slate-800/50 border-white/20" />
                   </div>
-                  <Dropdown
-                    v-model="userRoleFilter"
-                    :options="roleFilterOptions"
-                    optionLabel="label"
-                    optionValue="value"
-                    placeholder="Filtrer par rôle"
-                    class="w-48 bg-slate-800/50"
-                    showClear
-                  />
+                  <Dropdown v-model="userRoleFilter" :options="roleFilterOptions" optionLabel="label"
+                    optionValue="value" placeholder="Filtrer par rôle" class="w-48 bg-slate-800/50" showClear />
                 </div>
               </div>
 
               <!-- Table moderne des utilisateurs -->
               <div class="bg-slate-800/30 rounded-xl border border-white/10 overflow-hidden">
-                <DataTable
-                  :value="filteredUsers"
-                  :paginator="true"
-                  :rows="10"
-                  :loading="loadingUsers"
-                  stripedRows
+                <DataTable :value="filteredUsers" :paginator="true" :rows="10" :loading="loadingUsers" stripedRows
                   responsiveLayout="scroll"
                   paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
                   currentPageReportTemplate="{first} à {last} sur {totalRecords} utilisateurs"
-                  :rowsPerPageOptions="[5, 10, 25, 50]"
-                  class="custom-datatable"
-                  sortField="id"
-                  :sortOrder="-1"
-                >
+                  :rowsPerPageOptions="[5, 10, 25, 50]" class="[&_.p-datatable-tbody>tr]:bg-slate-700/30
+                         [&_.p-datatable-tbody>tr]:border-b
+                         [&_.p-datatable-tbody>tr]:border-white/10
+                         [&_.p-datatable-tbody>tr:nth-child(even)]:bg-slate-600/30
+                         [&_.p-datatable-tbody>tr:hover]:bg-blue-600/20
+                         [&_.p-datatable-header]:bg-slate-800/80
+                         [&_.p-datatable-header]:border-b
+                         [&_.p-datatable-header]:border-white/10
+                         [&_.p-column-header-content]:text-white
+                         [&_.p-column-header-content]:font-semibold
+                         [&_.p-paginator]:bg-slate-800/50
+                         [&_.p-paginator]:border-t
+                         [&_.p-paginator]:border-white/10" sortField="id" :sortOrder="-1">
+                  >
                   <Column field="id" header="ID" sortable class="w-16">
                     <template #body="slotProps">
                       <Badge :value="slotProps.data.id" severity="info" />
@@ -175,12 +149,8 @@
                   <Column field="username" header="Utilisateur" sortable>
                     <template #body="slotProps">
                       <div class="flex items-center gap-3">
-                        <Avatar
-                          :image="slotProps.data.avatar"
-                          shape="circle"
-                          size="normal"
-                          class="border-2 border-white/20"
-                        />
+                        <Avatar :image="slotProps.data.avatar" shape="circle" size="normal"
+                          class="border-2 border-white/20" />
                         <div>
                           <div class="font-medium text-white">{{ slotProps.data.username }}</div>
                           <div class="text-sm text-gray-400">{{ slotProps.data.email }}</div>
@@ -192,13 +162,9 @@
                   <Column field="roles" header="Rôles" class="w-32">
                     <template #body="slotProps">
                       <div class="flex gap-1 flex-wrap">
-                        <Tag
-                          v-for="role in slotProps.data.roles"
-                          :key="role"
+                        <Tag v-for="role in slotProps.data.roles" :key="role"
                           :value="role === 'ROLE_ADMIN' ? 'Admin' : 'User'"
-                          :severity="role === 'ROLE_ADMIN' ? 'danger' : 'info'"
-                          class="text-xs"
-                        />
+                          :severity="role === 'ROLE_ADMIN' ? 'danger' : 'info'" class="text-xs" />
                       </div>
                     </template>
                   </Column>
@@ -226,31 +192,13 @@
 
                   <Column header="Actions" class="w-32">
                     <template #body="slotProps">
-                      <div class="flex gap-2">
-                        <Button
-                          icon="pi pi-eye"
-                          size="small"
-                          severity="info"
-                          @click="viewUser(slotProps.data)"
-                          title="Voir le profil"
-                          rounded
-                        />
-                        <Button
-                          icon="pi pi-pencil"
-                          size="small"
-                          severity="warning"
-                          @click="openUserDialog(slotProps.data)"
-                          title="Modifier"
-                          rounded
-                        />
-                        <Button
-                          icon="pi pi-trash"
-                          size="small"
-                          severity="danger"
-                          @click="confirmDeleteUser(slotProps.data)"
-                          title="Supprimer"
-                          rounded
-                        />
+                      <div class="flex gap-2 margin-auto">
+                        <Button icon="pi pi-eye" size="small" severity="info" @click="viewUser(slotProps.data)"
+                          title="Voir le profil" rounded />
+                        <Button icon="pi pi-pencil" size="small" severity="warning"
+                          @click="openUserDialog(slotProps.data)" title="Modifier" rounded />
+                        <Button icon="pi pi-trash" size="small" severity="danger"
+                          @click="confirmDeleteUser(slotProps.data)" title="Supprimer" rounded />
                       </div>
                     </template>
                   </Column>
@@ -274,75 +222,47 @@
               <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4
                           bg-slate-700/50 p-4 rounded-xl border border-white/10">
                 <div class="flex gap-3 items-center flex-wrap">
-                  <Button
-                    label="Nouvelle Room"
-                    icon="pi pi-plus"
-                    @click="openRoomDialog()"
-                    class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-500/80 hover:to-emerald-600/80
-                           border-0 shadow-lg transition-all duration-300"
-                  />
-                  <Button
-                    label="Exporter CSV"
-                    icon="pi pi-download"
-                    severity="secondary"
-                    @click="exportRooms"
-                    class="shadow-md"
-                  />
-                  <Button
-                    label="Statistiques"
-                    icon="pi pi-chart-bar"
-                    severity="help"
-                    @click="() => {}"
-                    class="shadow-md"
-                  />
+                  <Button label="Nouvelle Room" icon="pi pi-plus" @click="openRoomDialog()" class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-500/80 hover:to-emerald-600/80
+                           border-0 shadow-lg transition-all duration-300" />
+                  <Button label="Exporter CSV" icon="pi pi-download" severity="secondary" @click="exportRooms"
+                    class="shadow-md" />
+                  <Button label="Statistiques" icon="pi pi-chart-bar" severity="help" @click="() => { }"
+                    class="shadow-md" />
                 </div>
 
                 <div class="flex gap-3 items-center flex-wrap">
                   <div class="relative">
                     <i class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    <InputText
-                      v-model="roomSearch"
-                      placeholder="Rechercher une room..."
-                      class="pl-10 w-64 bg-slate-800/50 border-white/20"
-                    />
+                    <InputText v-model="roomSearch" placeholder="Rechercher une room..."
+                      class="pl-10 w-64 bg-slate-800/50 border-white/20" />
                   </div>
-                  <Dropdown
-                    v-model="roomGameFilter"
-                    :options="gameFilterOptions"
-                    optionLabel="label"
-                    optionValue="value"
-                    placeholder="Filtrer par jeu"
-                    class="w-48 bg-slate-800/50"
-                    showClear
-                  />
-                  <Dropdown
-                    v-model="roomStatusFilter"
-                    :options="statusFilterOptions"
-                    optionLabel="label"
-                    optionValue="value"
-                    placeholder="Filtrer par statut"
-                    class="w-48 bg-slate-800/50"
-                    showClear
-                  />
+                  <Dropdown v-model="roomGameFilter" :options="gameFilterOptions" optionLabel="label"
+                    optionValue="value" placeholder="Filtrer par jeu" class="w-48 bg-slate-800/50" showClear />
+                  <Dropdown v-model="roomStatusFilter" :options="statusFilterOptions" optionLabel="label"
+                    optionValue="value" placeholder="Filtrer par statut" class="w-48 bg-slate-800/50" showClear />
                 </div>
               </div>
 
               <!-- Table moderne des rooms -->
               <div class="bg-slate-800/30 rounded-xl border border-white/10 overflow-hidden">
-                <DataTable
-                  :value="filteredRooms"
-                  :paginator="true"
-                  :rows="10"
-                  :loading="loadingRooms"
-                  stripedRows
+                <DataTable :value="filteredRooms" :paginator="true" :rows="10" :loading="loadingRooms" stripedRows
                   responsiveLayout="scroll"
                   paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
                   currentPageReportTemplate="{first} à {last} sur {totalRecords} rooms"
-                  :rowsPerPageOptions="[5, 10, 25, 50]"
-                  class="custom-datatable"
-                  sortField="createdAt"
-                  :sortOrder="-1"
-                >
+                  :rowsPerPageOptions="[5, 10, 25, 50]" class="[&_.p-datatable-tbody>tr]:bg-slate-700/30
+                         [&_.p-datatable-tbody>tr]:border-b
+                         [&_.p-datatable-tbody>tr]:border-white/10
+                         [&_.p-datatable-tbody>tr:nth-child(even)]:bg-slate-600/30
+                         [&_.p-datatable-tbody>tr:hover]:bg-blue-600/20
+                         [&_.p-datatable-header]:bg-slate-800/80
+                         [&_.p-datatable-header]:border-b
+                         [&_.p-datatable-header]:border-white/10
+                         [&_.p-column-header-content]:text-white
+                         [&_.p-column-header-content]:font-semibold
+                         [&_.p-paginator]:bg-slate-800/50
+                         [&_.p-paginator]:border-t
+                         [&_.p-paginator]:border-white/10" sortField="createdAt" :sortOrder="-1">
+                  >
                   <Column field="id" header="ID" sortable class="w-16">
                     <template #body="slotProps">
                       <Badge :value="slotProps.data.id" severity="success" />
@@ -352,11 +272,9 @@
                   <Column field="name" header="Room" sortable>
                     <template #body="slotProps">
                       <div class="flex items-center gap-3">
-                        <img
-                          :src="slotProps.data.game?.image || '/img/games/default.png'"
+                        <img :src="slotProps.data.game?.image || '/img/games/default.png'"
                           :alt="slotProps.data.game?.name"
-                          class="w-10 h-10 rounded-lg object-cover border-2 border-white/20"
-                        />
+                          class="w-10 h-10 rounded-lg object-cover border-2 border-white/20" />
                         <div>
                           <div class="font-medium text-white">{{ slotProps.data.name }}</div>
                           <div class="text-sm text-gray-400">{{ slotProps.data.game?.name }}</div>
@@ -368,12 +286,8 @@
                   <Column field="owner.username" header="Créateur" sortable class="w-32">
                     <template #body="slotProps">
                       <div class="flex items-center gap-2">
-                        <Avatar
-                          :image="slotProps.data.owner?.avatar"
-                          shape="circle"
-                          size="small"
-                          class="border border-white/20"
-                        />
+                        <Avatar :image="slotProps.data.owner?.avatar" shape="circle" size="small"
+                          class="border border-white/20" />
                         <span class="text-sm text-white">{{ slotProps.data.owner?.username }}</span>
                       </div>
                     </template>
@@ -385,22 +299,17 @@
                         <div class="text-neonBlue font-bold">
                           {{ slotProps.data.currentPlayers || 0 }} / {{ slotProps.data.maxPlayers }}
                         </div>
-                        <ProgressBar
-                          :value="getPlayerPercentage(slotProps.data)"
-                          :showValue="false"
-                          class="h-2 w-full mt-1"
-                        />
+                        <ProgressBar :value="getPlayerPercentage(slotProps.data)" :showValue="false"
+                          class="h-2 w-full mt-1" />
                       </div>
                     </template>
                   </Column>
 
                   <Column field="status" header="Statut" class="w-24">
                     <template #body="slotProps">
-                      <Tag
-                        :value="getStatusLabel(slotProps.data.status)"
+                      <Tag :value="getStatusLabel(slotProps.data.status)"
                         :severity="getStatusSeverity(slotProps.data.status)"
-                        :icon="getStatusIcon(slotProps.data.status)"
-                      />
+                        :icon="getStatusIcon(slotProps.data.status)" />
                     </template>
                   </Column>
 
@@ -416,30 +325,12 @@
                   <Column header="Actions" class="w-32">
                     <template #body="slotProps">
                       <div class="flex gap-2">
-                        <Button
-                          icon="pi pi-eye"
-                          size="small"
-                          severity="info"
-                          @click="viewRoom(slotProps.data)"
-                          title="Voir la room"
-                          rounded
-                        />
-                        <Button
-                          icon="pi pi-pencil"
-                          size="small"
-                          severity="warning"
-                          @click="openRoomDialog(slotProps.data)"
-                          title="Modifier"
-                          rounded
-                        />
-                        <Button
-                          icon="pi pi-trash"
-                          size="small"
-                          severity="danger"
-                          @click="confirmDeleteRoom(slotProps.data)"
-                          title="Supprimer"
-                          rounded
-                        />
+                        <Button icon="pi pi-eye" size="small" severity="info" @click="viewRoom(slotProps.data)"
+                          title="Voir la room" rounded />
+                        <Button icon="pi pi-pencil" size="small" severity="warning"
+                          @click="openRoomDialog(slotProps.data)" title="Modifier" rounded />
+                        <Button icon="pi pi-trash" size="small" severity="danger"
+                          @click="confirmDeleteRoom(slotProps.data)" title="Supprimer" rounded />
                       </div>
                     </template>
                   </Column>
@@ -452,68 +343,40 @@
     </div>
 
     <!-- Dialog pour créer/modifier un utilisateur -->
-    <Dialog
-      v-model:visible="userDialogVisible"
-      :header="editingUser ? 'Modifier Utilisateur' : 'Nouvel Utilisateur'"
-      modal
-      class="w-full max-w-2xl"
-      :closable="false"
-    >
+    <Dialog v-model:visible="userDialogVisible" :header="editingUser ? 'Modifier Utilisateur' : 'Nouvel Utilisateur'"
+      modal class="w-full max-w-2xl" :closable="false">
       <form @submit.prevent="saveUser" class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-300">Nom d'utilisateur *</label>
-            <InputText
-              v-model="userForm.username"
-              required
-              class="w-full bg-slate-800/50 border-white/20"
-              :class="{ 'border-red-500': userFormErrors.username }"
-            />
+            <InputText v-model="userForm.username" required class="w-full bg-slate-800/50 border-white/20"
+              :class="{ 'border-red-500': userFormErrors.username }" />
             <small v-if="userFormErrors.username" class="text-red-400">{{ userFormErrors.username }}</small>
           </div>
 
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-300">Email *</label>
-            <InputText
-              v-model="userForm.email"
-              type="email"
-              required
-              class="w-full bg-slate-800/50 border-white/20"
-              :class="{ 'border-red-500': userFormErrors.email }"
-            />
+            <InputText v-model="userForm.email" type="email" required class="w-full bg-slate-800/50 border-white/20"
+              :class="{ 'border-red-500': userFormErrors.email }" />
             <small v-if="userFormErrors.email" class="text-red-400">{{ userFormErrors.email }}</small>
           </div>
         </div>
 
         <div v-if="!editingUser">
           <label class="block text-sm font-medium mb-2 text-gray-300">Mot de passe *</label>
-          <Password
-            v-model="userForm.password"
-            required
-            class="w-full"
-            :feedback="false"
-            toggleMask
-            placeholder="Entrez un mot de passe sécurisé"
-          />
+          <Password v-model="userForm.password" required class="w-full" :feedback="false" toggleMask
+            placeholder="Entrez un mot de passe sécurisé" />
         </div>
 
         <div>
           <label class="block text-sm font-medium mb-2 text-gray-300">Rôles *</label>
           <div class="flex gap-4">
             <div class="flex items-center">
-              <Checkbox
-                v-model="userForm.roles"
-                inputId="role-user"
-                value="ROLE_USER"
-              />
+              <Checkbox v-model="userForm.roles" inputId="role-user" value="ROLE_USER" />
               <label for="role-user" class="ml-2 text-gray-300">Utilisateur</label>
             </div>
             <div class="flex items-center">
-              <Checkbox
-                v-model="userForm.roles"
-                inputId="role-admin"
-                value="ROLE_ADMIN"
-              />
+              <Checkbox v-model="userForm.roles" inputId="role-admin" value="ROLE_ADMIN" />
               <label for="role-admin" class="ml-2 text-gray-300">Administrateur</label>
             </div>
           </div>
@@ -522,79 +385,39 @@
         <div>
           <label class="block text-sm font-medium mb-2 text-gray-300">Avatar</label>
           <div class="flex items-center gap-4">
-            <Avatar
-              :image="userForm.avatar || '/img/avatar/1.png'"
-              shape="circle"
-              size="large"
-              class="border-2 border-white/20"
-            />
-            <FileUpload
-              mode="basic"
-              name="avatar"
-              :maxFileSize="1000000"
-              accept="image/*"
-              @select="onAvatarSelect"
-              chooseLabel="Changer l'avatar"
-              class="flex-1"
-            />
+            <Avatar :image="userForm.avatar || '/img/avatar/1.png'" shape="circle" size="large"
+              class="border-2 border-white/20" />
+
           </div>
         </div>
 
-        <div class="flex justify-end gap-3 pt-6 border-t border-white/10">
-          <Button
-            label="Annuler"
-            severity="secondary"
-            @click="userDialogVisible = false"
-            class="px-6"
-          />
-          <Button
-            label="Sauvegarder"
-            type="submit"
-            :loading="savingUser"
-            class="px-6 bg-gradient-to-r from-neonBlue to-purple-600 border-0"
-          />
+        <div class="flex justify-end gap-3 pt-6 border-t border-white/10 m-auto">
+          <Button label="Annuler" severity="secondary" @click="userDialogVisible = false" class="px-6" />
+          <Button label="Sauvegarder" type="submit" :loading="savingUser"
+            class="px-6 bg-gradient-to-r from-neonBlue to-purple-600 border-0" />
         </div>
       </form>
     </Dialog>
 
     <!-- Dialog pour créer/modifier une room -->
-    <Dialog
-      v-model:visible="roomDialogVisible"
-      :header="editingRoom ? 'Modifier Room' : 'Nouvelle Room'"
-      modal
-      class="w-full max-w-2xl"
-      :closable="false"
-    >
+    <Dialog v-model:visible="roomDialogVisible" :header="editingRoom ? 'Modifier Room' : 'Nouvelle Room'" modal
+      class="w-full max-w-2xl" :closable="false">
       <form @submit.prevent="saveRoom" class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="md:col-span-2">
             <label class="block text-sm font-medium mb-2 text-gray-300">Nom de la room *</label>
-            <InputText
-              v-model="roomForm.name"
-              required
-              class="w-full bg-slate-800/50 border-white/20"
-              placeholder="Entrez le nom de la room"
-            />
+            <InputText v-model="roomForm.name" required class="w-full bg-slate-800/50 border-white/20"
+              placeholder="Entrez le nom de la room" />
           </div>
 
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-300">Jeu *</label>
-            <Dropdown
-              v-model="roomForm.gameId"
-              :options="gameOptions"
-              optionLabel="name"
-              optionValue="id"
-              placeholder="Sélectionner un jeu"
-              class="w-full bg-slate-800/50"
-              required
-            >
+            <Dropdown v-model="roomForm.gameId" :options="gameOptions" optionLabel="name" optionValue="id"
+              placeholder="Sélectionner un jeu" class="w-full bg-slate-800/50" required>
               <template #option="slotProps">
                 <div class="flex items-center gap-3">
-                  <img
-                    :src="slotProps.option.image"
-                    :alt="slotProps.option.name"
-                    class="w-8 h-8 rounded object-cover"
-                  />
+                  <img :src="slotProps.option.image" :alt="slotProps.option.name"
+                    class="w-8 h-8 rounded object-cover" />
                   <span>{{ slotProps.option.name }}</span>
                 </div>
               </template>
@@ -603,40 +426,42 @@
 
           <div>
             <label class="block text-sm font-medium mb-2 text-gray-300">Nombre max de joueurs *</label>
-            <InputNumber
-              v-model="roomForm.maxPlayers"
-              :min="2"
-              :max="8"
-              class="w-full"
-              required
-              showButtons
-            />
+            <InputNumber v-model="roomForm.maxPlayers" :min="2" :max="8" class="w-full" required showButtons />
           </div>
         </div>
 
-        <div class="flex justify-end gap-3 pt-6 border-t border-white/10">
-          <Button
-            label="Annuler"
-            severity="secondary"
-            @click="roomDialogVisible = false"
-            class="px-6"
-          />
-          <Button
-            label="Sauvegarder"
-            type="submit"
-            :loading="savingRoom"
-            class="px-6 bg-gradient-to-r from-green-500 to-emerald-600 border-0"
-          />
+        <div class="flex justify-end gap-3 pt-6 border-t border-white/10 m-auto">
+          <Button label="Annuler" severity="secondary" @click="roomDialogVisible = false" class="px-6" />
+          <Button label="Sauvegarder" type="submit" :loading="savingRoom"
+            class="px-6 bg-gradient-to-r from-green-500 to-emerald-600 border-0" />
         </div>
       </form>
     </Dialog>
 
     <!-- Dialog de confirmation de suppression -->
-    <ConfirmDialog>
+    <ConfirmDialog class="[&_.p-dialog-content]:p-0
+             [&_.p-dialog-content]:rounded-lg
+             [&_.p-confirmdialog-message]:m-0
+             [&_.p-confirmdialog-message]:p-0
+             [&_strong]:font-bold
+             [&_strong]:text-white
+             [&_.text-orange-600]:text-orange-600
+             [&_.text-orange-600]:font-semibold
+             [&_.text-red-600]:text-red-600
+             [&_.text-red-600]:font-semibold
+             [&_.p-dialog-footer]:justify-center
+             [&_.p-dialog-footer]:gap-3
+             [&_.p-dialog-footer]:m-auto
+             [&_.p-dialog-footer]:flex-col
+             [&_ul]:text-left
+             [&_ul]:my-2
+             [&_li]:my-1
+             text-center
+             text-white">
       <template #message="slotProps">
-        <div class="flex items-center gap-3">
-          <i class="pi pi-exclamation-triangle text-orange-500 text-2xl"></i>
-          <span>{{ slotProps.message }}</span>
+        <div class="flex flex-col items-center justify-center text-center p-6 space-y-4">
+          <i :class="slotProps.message.icon || 'pi pi-exclamation-triangle'" class="text-4xl text-orange-500 mb-2"></i>
+          <div v-html="slotProps.message.message" class="leading-relaxed max-w-md mx-auto text-white"></div>
         </div>
       </template>
     </ConfirmDialog>
@@ -647,7 +472,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/useAuthStore'
 import { useToast } from 'primevue/usetoast'
@@ -658,7 +483,6 @@ import Toast from 'primevue/toast';
 import ConfirmDialog from 'primevue/confirmdialog';
 import Textarea from 'primevue/textarea';
 import Dialog from 'primevue/dialog';
-import FileUpload from 'primevue/fileupload';
 import Badge from 'primevue/badge';
 import Checkbox from 'primevue/checkbox';
 import ProgressBar from 'primevue/progressbar';
@@ -683,20 +507,27 @@ const auth = useAuthStore()
 const toast = useToast()
 const confirm = useConfirm()
 
+// Variable pour stocker l'intervalle de rafraîchissement
+let refreshInterval: NodeJS.Timeout | null = null
+
 // Vérification des permissions admin
 onMounted(async () => {
   console.log('AdminView mounted')
-  console.log('Auth state:', {
-    isAuthenticated: auth.isAuthenticated,
-    isAdmin: auth.isAdmin,
-    token: auth.token?.substring(0, 50) + '...'
-  })
-
-  // Pour les tests, on charge directement les données
-  console.log('Loading data for testing...')
-  await loadData()
 
   await loadData()
+
+  // 🔄 Recharger automatiquement toutes les 30 secondes pour voir les changements de statut
+  refreshInterval = setInterval(async () => {
+    console.log('🔄 Rechargement automatique des données admin...')
+    await loadData()
+  }, 30000) // 30 secondes
+})
+
+// Nettoyer l'intervalle quand le composant est détruit
+onUnmounted(() => {
+  if (refreshInterval) {
+    clearInterval(refreshInterval)
+  }
 })
 
 // Fonction pour vérifier si l'utilisateur est admin (supprimée, utilise auth.isAdmin)
@@ -845,11 +676,15 @@ const formatTime = (date: string) => {
 }
 
 const isUserOnline = (lastActive?: string) => {
-  if (!lastActive) return false
+  if (!lastActive) {
+    console.log('❌ No lastActive provided')
+    return false
+  }
   const now = new Date()
   const lastActiveDate = new Date(lastActive)
   const diffMinutes = (now.getTime() - lastActiveDate.getTime()) / (1000 * 60)
-  return diffMinutes < 5 // En ligne si actif dans les 5 dernières minutes
+  const isOnline = diffMinutes < 5 // En ligne si actif dans les 5 dernières minutes
+  return isOnline
 }
 
 const getLastActiveText = (lastActive?: string) => {
@@ -899,7 +734,6 @@ const getStatusIcon = (status: string) => {
 // Chargement des données
 const loadData = async () => {
   try {
-    console.log('Loading admin data...')
     loadingUsers.value = true
     loadingRooms.value = true
 
@@ -924,30 +758,31 @@ const loadData = async () => {
     rooms.value = roomsRes.data
     games.value = gamesRes.data || []
 
-    console.log('Loaded users:', users.value)
-    console.log('Loaded rooms:', rooms.value)
-    console.log('Loaded games:', games.value)
-
     // Calcul des statistiques
     calculateStats()
-    console.log('Data loaded successfully')
   } catch (error: any) {
     console.error('Erreur chargement:', error)
 
-    let errorMessage = 'Impossible de charger les données'
+    let errorMessage = 'Impossible de charger les données administrateur'
+
     if (error.response?.status === 401) {
-      errorMessage = 'Session expirée. Veuillez vous reconnecter.'
+      errorMessage = 'Votre session a expiré. Veuillez vous reconnecter'
       router.push('/auth')
     } else if (error.response?.status === 403) {
-      errorMessage = 'Accès non autorisé'
+      errorMessage = 'Vous n\'avez pas les permissions d\'administrateur nécessaires'
+    } else if (error.response?.status === 500) {
+      errorMessage = 'Erreur du serveur. Veuillez réessayer plus tard'
     } else if (error.response?.data?.message) {
       errorMessage = error.response.data.message
+    } else if (error.message) {
+      errorMessage = `Erreur de connexion: ${error.message}`
     }
 
     toast.add({
       severity: 'error',
-      summary: 'Erreur',
-      detail: errorMessage
+      summary: 'Erreur de chargement',
+      detail: errorMessage,
+      life: 6000
     })
   } finally {
     loadingUsers.value = false
@@ -1000,18 +835,21 @@ const validateUserForm = () => {
   let isValid = true
 
   if (!userForm.value.username.trim()) {
-    userFormErrors.value.username = 'Le nom d\'utilisateur est requis'
+    userFormErrors.value.username = 'Le nom d\'utilisateur est obligatoire'
     isValid = false
   } else if (userForm.value.username.length < 3) {
-    userFormErrors.value.username = 'Le nom d\'utilisateur doit faire au moins 3 caractères'
+    userFormErrors.value.username = 'Le nom d\'utilisateur doit contenir au moins 3 caractères'
+    isValid = false
+  } else if (userForm.value.username.length > 50) {
+    userFormErrors.value.username = 'Le nom d\'utilisateur ne peut pas dépasser 50 caractères'
     isValid = false
   }
 
   if (!userForm.value.email.trim()) {
-    userFormErrors.value.email = 'L\'email est requis'
+    userFormErrors.value.email = 'L\'adresse email est obligatoire'
     isValid = false
   } else if (!/\S+@\S+\.\S+/.test(userForm.value.email)) {
-    userFormErrors.value.email = 'L\'email n\'est pas valide'
+    userFormErrors.value.email = 'L\'adresse email n\'est pas valide'
     isValid = false
   }
 
@@ -1081,7 +919,7 @@ const saveUser = async () => {
   } catch (error: any) {
     console.error('Erreur sauvegarde utilisateur:', error)
 
-    let errorMessage = 'Erreur lors de la sauvegarde'
+    let errorMessage = 'Une erreur est survenue lors de la sauvegarde'
 
     if (error.response?.status === 422 && error.response.data?.violations) {
       // Erreurs de validation Symfony
@@ -1094,16 +932,23 @@ const saveUser = async () => {
         }
       })
       return // Ne pas fermer le dialog en cas d'erreur de validation
+    } else if (error.response?.status === 409) {
+      errorMessage = 'Un utilisateur avec ce nom d\'utilisateur ou cette adresse email existe déjà'
+    } else if (error.response?.status === 401) {
+      errorMessage = 'Vous n\'êtes pas autorisé à effectuer cette action'
+    } else if (error.response?.status === 403) {
+      errorMessage = 'Accès refusé. Permissions insuffisantes'
     } else if (error.response?.data?.message) {
       errorMessage = error.response.data.message
-    } else if (error.response?.status === 409) {
-      errorMessage = 'Un utilisateur avec ce nom ou email existe déjà'
+    } else if (error.message) {
+      errorMessage = `Erreur de connexion: ${error.message}`
     }
 
     toast.add({
       severity: 'error',
-      summary: 'Erreur',
-      detail: errorMessage
+      summary: 'Erreur de sauvegarde',
+      detail: errorMessage,
+      life: 5000
     })
   } finally {
     savingUser.value = false
@@ -1111,12 +956,70 @@ const saveUser = async () => {
 }
 
 const confirmDeleteUser = (user: User) => {
+  // Vérification défensive des propriétés
+  const username = user?.username || 'Utilisateur inconnu'
+  const roles = user?.roles || []
+
+  let message = `Êtes-vous sûr de vouloir supprimer l'utilisateur <strong>"${username}"</strong> ?<br><br>Cette action est <strong>IRRÉVERSIBLE</strong>.`
+  let header = 'Confirmation de suppression'
+
+  // Message spécial pour les administrateurs
+  if (roles.includes('ROLE_ADMIN')) {
+    message = `
+      <div class="space-y-3">
+        <div class="text-orange-600 font-bold text-lg">⚠️ ATTENTION</div>
+        <div>Vous allez supprimer l'administrateur <strong class="text-gray-900">"${username}"</strong>.</div>
+
+        <div class="text-left">
+          <div class="font-semibold text-white mb-2">Cette action va également :</div>
+          <ul class="text-sm text-gray-700 space-y-1 list-disc list-inside">
+            <li>Supprimer toutes les rooms qu'il/elle possède</li>
+            <li>Le/la retirer de toutes les parties en cours</li>
+            <li>Effacer ses jeux favoris</li>
+          </ul>
+        </div>
+
+        <div class="text-red-600 font-bold text-lg mt-4">
+          Cette action est IRRÉVERSIBLE.
+        </div>
+        <div class="font-semibold m-auto">
+          Confirmez-vous la suppression ?
+        </div>
+      </div>
+    `
+    header = '⚠️ Suppression d\'un Administrateur'
+  } else {
+    message = `
+      <div class="space-y-3">
+        <div>Êtes-vous sûr de vouloir supprimer l'utilisateur <strong class="text-gray-900">"${username}"</strong> ?</div>
+
+        <div class="text-left">
+          <div class="font-semibold text-white mb-2">Cette action va également :</div>
+          <ul class="text-sm text-white space-y-1 list-disc list-inside">
+            <li>Supprimer toutes les rooms qu'il/elle possède</li>
+            <li>Le/la retirer de toutes les parties en cours</li>
+            <li>Effacer ses jeux favoris</li>
+          </ul>
+        </div>
+
+        <div class="text-red-600 font-bold text-lg mt-4">
+          Cette action est IRRÉVERSIBLE.
+        </div>
+      </div>
+    `
+  }
+
   confirm.require({
-    message: `Êtes-vous sûr de vouloir supprimer l'utilisateur "${user.username}" ? Cette action est irréversible.`,
-    header: 'Confirmation de suppression',
+    message: message,
+    header: header,
     icon: 'pi pi-exclamation-triangle',
     acceptClass: 'p-button-danger',
-    accept: () => deleteUser(user)
+    rejectLabel: 'Annuler',
+    acceptLabel: 'Supprimer définitivement',
+    accept: () => deleteUser(user),
+    reject: () => {
+      console.log('Suppression annulée')
+    }
   })
 }
 
@@ -1141,16 +1044,29 @@ const deleteUser = async (user: User) => {
     console.error('Erreur suppression utilisateur:', error)
 
     let errorMessage = 'Erreur lors de la suppression'
+    let severity = 'error'
+
     if (error.response?.status === 409) {
-      errorMessage = 'Impossible de supprimer cet utilisateur (données liées)'
+      // Erreur de conflit - dernier admin ou données liées
+      errorMessage = error.response.data?.message || 'Impossible de supprimer cet utilisateur car il possède des données liées'
+      severity = 'warn'
+    } else if (error.response?.status === 404) {
+      errorMessage = 'Utilisateur non trouvé'
+    } else if (error.response?.status === 500) {
+      // Erreur serveur - afficher plus de détails
+      errorMessage = 'Erreur interne du serveur lors de la suppression'
+      console.error('Détails erreur 500:', error.response.data)
     } else if (error.response?.data?.message) {
       errorMessage = error.response.data.message
+    } else if (error.message) {
+      errorMessage = `Erreur de connexion: ${error.message}`
     }
 
     toast.add({
-      severity: 'error',
-      summary: 'Erreur',
-      detail: errorMessage
+      severity,
+      summary: 'Erreur de suppression',
+      detail: errorMessage,
+      life: 6000 // Afficher plus longtemps pour les erreurs
     })
   }
 }
@@ -1234,22 +1150,31 @@ const saveRoom = async () => {
   } catch (error: any) {
     console.error('Erreur sauvegarde room:', error)
 
-    let errorMessage = 'Erreur lors de la sauvegarde'
+    let errorMessage = 'Une erreur est survenue lors de la sauvegarde de la room'
 
     if (error.response?.status === 422 && error.response.data?.violations) {
       // Erreurs de validation Symfony
       const violations = error.response.data.violations
       errorMessage = violations.map((v: any) => v.message).join(', ')
+    } else if (error.response?.status === 404) {
+      errorMessage = 'Le jeu sélectionné n\'existe pas'
+    } else if (error.response?.status === 409) {
+      errorMessage = 'Une room avec ce nom existe déjà'
+    } else if (error.response?.status === 401) {
+      errorMessage = 'Vous n\'êtes pas autorisé à effectuer cette action'
+    } else if (error.response?.status === 403) {
+      errorMessage = 'Accès refusé. Permissions insuffisantes'
     } else if (error.response?.data?.message) {
       errorMessage = error.response.data.message
-    } else if (error.response?.status === 404) {
-      errorMessage = 'Jeu non trouvé'
+    } else if (error.message) {
+      errorMessage = `Erreur de connexion: ${error.message}`
     }
 
     toast.add({
       severity: 'error',
-      summary: 'Erreur',
-      detail: errorMessage
+      summary: 'Erreur de sauvegarde',
+      detail: errorMessage,
+      life: 5000
     })
   } finally {
     savingRoom.value = false
@@ -1257,11 +1182,23 @@ const saveRoom = async () => {
 }
 
 const confirmDeleteRoom = (room: Room) => {
+  const message = `
+    <div class="space-y-3">
+      <div>Êtes-vous sûr de vouloir supprimer la room <strong class="text-white">"${room.name}"</strong> ?</div>
+
+      <div class="text-red-600 font-bold text-lg mt-4">
+        Cette action est IRRÉVERSIBLE.
+      </div>
+    </div>
+  `
+
   confirm.require({
-    message: `Êtes-vous sûr de vouloir supprimer la room "${room.name}" ? Cette action est irréversible.`,
+    message,
     header: 'Confirmation de suppression',
     icon: 'pi pi-exclamation-triangle',
     acceptClass: 'p-button-danger',
+    rejectLabel: 'Annuler',
+    acceptLabel: 'Supprimer définitivement',
     accept: () => deleteRoom(room)
   })
 }
@@ -1286,17 +1223,27 @@ const deleteRoom = async (room: Room) => {
   } catch (error: any) {
     console.error('Erreur suppression room:', error)
 
-    let errorMessage = 'Erreur lors de la suppression'
+    let errorMessage = 'Une erreur est survenue lors de la suppression de la room'
+
     if (error.response?.status === 409) {
-      errorMessage = 'Impossible de supprimer cette room (partie en cours)'
+      errorMessage = 'Impossible de supprimer cette room car une partie est actuellement en cours'
+    } else if (error.response?.status === 404) {
+      errorMessage = 'La room à supprimer n\'existe plus'
+    } else if (error.response?.status === 401) {
+      errorMessage = 'Vous n\'êtes pas autorisé à supprimer cette room'
+    } else if (error.response?.status === 403) {
+      errorMessage = 'Accès refusé. Permissions insuffisantes'
     } else if (error.response?.data?.message) {
       errorMessage = error.response.data.message
+    } else if (error.message) {
+      errorMessage = `Erreur de connexion: ${error.message}`
     }
 
     toast.add({
       severity: 'error',
-      summary: 'Erreur',
-      detail: errorMessage
+      summary: 'Erreur de suppression',
+      detail: errorMessage,
+      life: 5000
     })
   }
 }
@@ -1311,8 +1258,8 @@ const exportUsers = () => {
   const csvContent = "data:text/csv;charset=utf-8,"
     + "ID,Nom d'utilisateur,Email,Rôles,Date d'inscription,Dernière activité\n"
     + users.value.map(user =>
-        `${user.id},"${user.username}","${user.email}","${user.roles.join(', ')}","${formatDate(user.createdAt)}","${getLastActiveText(user.lastActive)}"`
-      ).join("\n")
+      `${user.id},"${user.username}","${user.email}","${user.roles.join(', ')}","${formatDate(user.createdAt)}","${getLastActiveText(user.lastActive)}"`
+    ).join("\n")
 
   const encodedUri = encodeURI(csvContent)
   const link = document.createElement("a")
@@ -1333,8 +1280,8 @@ const exportRooms = () => {
   const csvContent = "data:text/csv;charset=utf-8,"
     + "ID,Nom,Jeu,Créateur,Joueurs,Statut,Date de création\n"
     + rooms.value.map((room: { id: any; name: any; game: { name: any }; owner: { username: any }; currentPlayers: any; maxPlayers: any; status: string; createdAt: string }) =>
-        `${room.id},"${room.name}","${room.game.name}","${room.owner.username}","${room.currentPlayers}/${room.maxPlayers}","${getStatusLabel(room.status)}","${formatDate(room.createdAt)}"`
-      ).join("\n")
+      `${room.id},"${room.name}","${room.game.name}","${room.owner.username}","${room.currentPlayers}/${room.maxPlayers}","${getStatusLabel(room.status)}","${formatDate(room.createdAt)}"`
+    ).join("\n")
 
   const encodedUri = encodeURI(csvContent)
   const link = document.createElement("a")
@@ -1351,45 +1298,4 @@ const exportRooms = () => {
   })
 }
 
-// Gestion upload avatar
-const onAvatarSelect = (event: any) => {
-  const file = event.files[0]
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      userForm.value.avatar = e.target?.result as string
-    }
-    reader.readAsDataURL(file)
-  }
-}
 </script>
-
-<style scoped>
-.custom-datatable ::v-deep(.p-datatable-tbody > tr) {
-  background: rgba(51, 65, 85, 0.3);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.custom-datatable ::v-deep(.p-datatable-tbody > tr:nth-child(even)) {
-  background: rgba(71, 85, 105, 0.3);
-}
-
-.custom-datatable ::v-deep(.p-datatable-tbody > tr:hover) {
-  background: rgba(59, 130, 246, 0.2);
-}
-
-.custom-datatable ::v-deep(.p-datatable-header) {
-  background: rgba(30, 41, 59, 0.8);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.custom-datatable ::v-deep(.p-column-header-content) {
-  color: white;
-  font-weight: 600;
-}
-
-.custom-datatable ::v-deep(.p-paginator) {
-  background: rgba(30, 41, 59, 0.5);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-</style>

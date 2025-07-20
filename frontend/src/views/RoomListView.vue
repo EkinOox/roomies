@@ -72,9 +72,9 @@
           <button @click="modalOpen = false" class="px-4 py-2 text-sm bg-gray-600 rounded hover:bg-gray-700 transition">
             Annuler
           </button>
-          <button @click="createRoom" :disabled="!newRoom.name || !newRoom.game || !newRoom.maxPlayers"
+          <button @click="createRoom" :disabled="!newRoom.name || !newRoom.gameId || !newRoom.maxPlayers"
             class="px-4 py-2 text-sm text-white rounded transition" :class="[
-              (!newRoom.name || !newRoom.game || !newRoom.maxPlayers)
+              (!newRoom.name || !newRoom.gameId || !newRoom.maxPlayers)
                 ? 'bg-gray-500 cursor-not-allowed'
                 : 'bg-neonPink hover:bg-pink-600'
             ]">
@@ -135,19 +135,19 @@ const toast = useToast()
 
 const newRoom = ref({
   name: '',
-  game: '',
+  gameId: null, // Changé de 'game' à 'gameId'
   maxPlayers: 2,
 })
 
 function selectGame(name) {
   if (selectedGameSlug.value === name) {
     selectedGameSlug.value = ''
-    newRoom.value.game = ''
+    newRoom.value.gameId = null // Changé pour gameId
   } else {
     const selected = games.value.find(g => g.name === name)
     if (selected) {
       selectedGameSlug.value = name
-      newRoom.value.game = selected.name
+      newRoom.value.gameId = selected.id // Utilise l'ID du jeu, pas le nom
     }
   }
 }
@@ -198,7 +198,7 @@ onMounted(() => {
 })
 
 async function createRoom() {
-  if (!newRoom.value.name || !newRoom.value.game || !newRoom.value.maxPlayers) {
+  if (!newRoom.value.name || !newRoom.value.gameId || !newRoom.value.maxPlayers) { // Changé game vers gameId
     toast.add({
       severity: 'warn',
       summary: 'Attention',
@@ -215,7 +215,7 @@ async function createRoom() {
       },
     })
 
-    newRoom.value = { name: '', game: '', maxPlayers: 1 }
+    newRoom.value = { name: '', gameId: null, maxPlayers: 1 }
     selectedGameSlug.value = ''
     modalOpen.value = false
     await fetchRooms()

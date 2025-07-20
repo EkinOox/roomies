@@ -110,6 +110,10 @@ final class AuthController extends AbstractController
             return $this->json(['message' => 'Identifiants invalides'], Response::HTTP_UNAUTHORIZED);
         }
 
+        // ? Mettre � jour lastActive lors de la connexion
+        $user->setLastActive(new \DateTimeImmutable());
+        $em->flush();
+
         // Génère un token JWT personnalisé avec des données supplémentaires
         $token = $jwtManager->createFromPayload($user, [
             'id' => $user->getId(),           // ID de l'utilisateur pour l'identification

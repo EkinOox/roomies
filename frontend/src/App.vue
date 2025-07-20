@@ -5,12 +5,15 @@ import GlobalChat from './components/GlobalChat.vue'
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/useAuthStore'
 import { socket } from '@/plugins/socket'
+import { useUserActivity } from './composables/useUserActivity'
 
 socket.connect()
 
-
 const auth = useAuthStore();
 const isAuthenticated = computed(() => auth.isAuthenticated);
+
+// Initialise le suivi d'activité utilisateur
+const userActivity = useUserActivity()
 </script>
 
 <template>

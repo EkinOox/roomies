@@ -38,8 +38,8 @@ class RoomController extends AbstractController
         // Décode les données JSON envoyées par le frontend
         $data = json_decode($request->getContent(), true);
 
-        // Recherche le jeu par son nom dans la base de données
-        $game = $em->getRepository(Game::class)->findOneBy(['name' => $data['game']]);
+        // Recherche le jeu par son ID dans la base de données
+        $game = $em->getRepository(Game::class)->find($data['gameId']);
         if (!$game) {
             return $this->json(['error' => 'Jeu non trouvé'], 400);
         }
@@ -56,7 +56,7 @@ class RoomController extends AbstractController
         $room->setName($data['name']);
         $room->setSlug(strtolower($slugger->slug($data['name']))); // Génère un slug pour l'URL
         $room->setCreatedAt(new \DateTimeImmutable());
-        $room->setGameType($data['game']);
+        $room->setGameType($game->getName()); // Utilise le nom du jeu trouvé
         $room->setGame($game);
         $room->setOwner($owner); // L'utilisateur connecté devient propriétaire
         $room->setMaxPlayers($data['maxPlayers']);
@@ -165,6 +165,12 @@ class RoomController extends AbstractController
                 $isSpectator = true;
             } else {
                 $room->addParticipant($user);
+
+                // 🎮 LOGIQUE DE STATUT : Passer à "active" quand la room est pleine
+                if ($room->getParticipants()->count() >= $room->getMaxPlayers() && $room->getStatus() === 'waiting') {
+                    $room->setStatus('active');
+                }
+
                 $em->flush();
             }
         }
@@ -197,9 +203,95 @@ class RoomController extends AbstractController
 
         if ($room->getParticipants()->contains($user)) {
             $room->removeParticipant($user);
+
+            // 🎮 LOGIQUE DE STATUT : Revenir à "waiting" si plus assez de joueurs
+            if ($room->getParticipants()->count() < $room->getMaxPlayers() && $room->getStatus() === 'active') {
+                $room->setStatus('waiting');
+            }
+
+            // 🎮 Si plus personne, remettre à "waiting"
+            if ($room->getParticipants()->count() === 0 && $room->getStatus() !== 'waiting') {
+                $room->setStatus('waiting');
+            }
+
             $em->flush();
         }
 
         return $this->json(['message' => 'Quitté avec succès'], 200);
+    }
+
+    /**
+     * Marque une room comme terminée
+     * Utilisé quand une partie se termine
+     */
+    #[Route('/{id}/finish', name: 'finish_room', methods: ['POST'])]
+    public function finishRoom(
+        int $id,
+        EntityManagerInterface $em,
+        TokenStorageInterface $tokenStorage
+    ): JsonResponse {
+        /** @var User|null $user */
+        $user = $tokenStorage->getToken()?->getUser();
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur non authentifié'], 401);
+        }
+
+        $room = $em->getRepository(Room::class)->find($id);
+        if (!$room) {
+            return $this->json(['error' => 'Room introuvable'], 404);
+        }
+
+        // Seul le propriétaire ou un admin peut terminer la partie
+        if ($room->getOwner()->getId() !== $user->getId() && !in_array('ROLE_ADMIN', $user->getRoles())) {
+            return $this->json(['error' => 'Seul le propriétaire peut terminer cette room'], 403);
+        }
+
+        $room->setStatus('finished');
+        $em->flush();
+
+        return $this->json([
+            'message' => 'Partie terminée avec succès',
+            'status' => $room->getStatus()
+        ], 200);
+    }
+
+    /**
+     * Redémarre une room (finished → waiting)
+     * Permet de relancer une nouvelle partie dans la même room
+     */
+    #[Route('/{id}/restart', name: 'restart_room', methods: ['POST'])]
+    public function restartRoom(
+        int $id,
+        EntityManagerInterface $em,
+        TokenStorageInterface $tokenStorage
+    ): JsonResponse {
+        /** @var User|null $user */
+        $user = $tokenStorage->getToken()?->getUser();
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur non authentifié'], 401);
+        }
+
+        $room = $em->getRepository(Room::class)->find($id);
+        if (!$room) {
+            return $this->json(['error' => 'Room introuvable'], 404);
+        }
+
+        // Seul le propriétaire peut redémarrer
+        if ($room->getOwner()->getId() !== $user->getId()) {
+            return $this->json(['error' => 'Seul le propriétaire peut redémarrer cette room'], 403);
+        }
+
+        // On peut seulement redémarrer une room terminée
+        if ($room->getStatus() !== 'finished') {
+            return $this->json(['error' => 'Seule une room terminée peut être redémarrée'], 400);
+        }
+
+        $room->setStatus('waiting');
+        $em->flush();
+
+        return $this->json([
+            'message' => 'Room redémarrée avec succès',
+            'status' => $room->getStatus()
+        ], 200);
     }
 }

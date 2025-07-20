@@ -23,8 +23,8 @@ class UserRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('u')
             ->select('COUNT(u.id)')
-            ->where('JSON_CONTAINS(u.roles, :role) = 1')
-            ->setParameter('role', json_encode($role))
+            ->where('u.roles LIKE :role')
+            ->setParameter('role', '%"' . $role . '"%')
             ->getQuery()
             ->getSingleScalarResult();
     }

@@ -17,6 +17,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@motionone/vue": "^10.16.4",
     "@primeuix/themes": "^1.1.1",
     "@tailwindcss/vite": "^4.1.7",

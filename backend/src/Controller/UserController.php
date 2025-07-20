@@ -39,7 +39,7 @@ final class UserController extends AbstractController
      * Utilisé pour afficher les informations personnelles dans l'interface
      */
     #[Route('/profile', name: 'api_me', methods: ['GET'])]
-    public function Profile(Security $security): JsonResponse
+    public function Profile(Security $security, EntityManagerInterface $em): JsonResponse
     {
         // Récupère l'utilisateur connecté depuis le token JWT
         $user = $security->getUser();
@@ -48,12 +48,17 @@ final class UserController extends AbstractController
             return $this->json(['error' => 'Utilisateur non connecté'], 401);
         }
 
+        // Met � jour l'activit� lors de l'acc�s au profil
+        $user->setLastActive(new \DateTimeImmutable());
+        $em->flush();
+
         return $this->json([
             'id' => $user->getId(),
             'username' => $user->getUsername(),
             'email' => $user->getEmail(),
             'avatar' => $user->getAvatar(),
             'roles' => $user->getRoles(),
+            'lastActive' => $user->getLastActive()?->format('c'),
         ]);
     }
 
@@ -222,5 +227,30 @@ final class UserController extends AbstractController
 
         // On retourne une réponse JSON indiquant que le jeu a bien été retiré des favoris
         return $this->json(['message' => 'Jeu retiré des favoris'], Response::HTTP_OK);
+    }
+
+    /**
+     * Met � jour l'activit� de l'utilisateur connect�
+     * Appel� automatiquement par le frontend pour maintenir le statut en ligne
+     */
+    #[Route('/activity', name: 'update_activity', methods: ['POST'])]
+    public function updateActivity(
+        Security $security,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $user = $security->getUser();
+
+        if (!$user instanceof User) {
+            return $this->json(['message' => 'Non autoris�'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        // Met � jour la derni�re activit�
+        $user->setLastActive(new \DateTimeImmutable());
+        $em->flush();
+
+        return $this->json([
+            'message' => 'Activity updated successfully',
+            'lastActive' => $user->getLastActive()->format('c')
+        ]);
     }
 }

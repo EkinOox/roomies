@@ -14,32 +14,39 @@
       <!-- Nom -->
       <div>
         <label class="block mb-2 text-sm font-medium text-cyan-200">Nom complet</label>
-        <InputText v-model="form.name" placeholder="Votre nom"
+        <InputText v-model="form.name" placeholder="Votre nom" required
           class="w-full rounded-xl px-4 py-2 text-black focus:ring-2 focus:ring-cyan-400" />
       </div>
 
       <!-- Email -->
       <div>
         <label class="block mb-2 text-sm font-medium text-cyan-200">Adresse e-mail</label>
-        <InputText v-model="form.email" placeholder="email@example.com"
+        <InputText v-model="form.email" placeholder="email@example.com" type="email" required
           class="w-full rounded-xl px-4 py-2 text-black focus:ring-2 focus:ring-cyan-400" />
       </div>
 
       <!-- Message -->
       <div>
         <label class="block mb-2 text-sm font-medium text-cyan-200">Message</label>
-        <Textarea v-model="form.message" rows="5" placeholder="Écrivez votre message ici..."
+        <Textarea v-model="form.message" rows="5" placeholder="Écrivez votre message ici..." required
           class="w-full rounded-xl px-4 py-2 text-black focus:ring-2 focus:ring-cyan-400" />
       </div>
 
+      <!-- Champ caché pour le nom du site -->
+      <input type="hidden" v-model="form.siteName" />
+
       <!-- Bouton envoyer -->
-      <Button label="Envoyer le message" type="submit" icon="pi pi-send"
+      <Button label="Envoyer le message" type="submit" icon="pi pi-send" :loading="sending"
         class="w-full justify-center bg-[#00F0FF] hover:bg-cyan-400 text-black font-bold rounded-xl py-3 transition-all duration-300" />
     </form>
 
-    <!-- Message de confirmation -->
+    <!-- Messages de feedback -->
     <p v-if="sent" class="mt-6 text-green-400 text-center animate-fade-in">
-      ✅ Merci pour votre message !
+      ✅ Merci pour votre message ! Il a été envoyé avec succès.
+    </p>
+
+    <p v-if="error" class="mt-6 text-red-400 text-center animate-fade-in">
+      ❌ Erreur lors de l'envoi : {{ error }}
     </p>
   </div>
 </template>
@@ -49,32 +56,76 @@ import { ref } from 'vue'
 import InputText from 'primevue/inputtext'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
+import emailjs from '@emailjs/browser'
 
 const form = ref({
   name: '',
   email: '',
-  message: ''
+  message: '',
+  siteName: 'Roomies'
 })
 
 const sent = ref(false)
+const error = ref('')
+const sending = ref(false)
 
-function handleSubmit() {
+// Configuration EmailJS depuis les variables d'environnement
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_xxxxxxx'
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_xxxxxxx'
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'your_public_key_here'
+const TO_EMAIL = import.meta.env.VITE_TO_EMAIL || 'votre-email@gmail.com'
+
+async function handleSubmit() {
   if (!form.value.name || !form.value.email || !form.value.message) {
-    alert("Merci de remplir tous les champs.")
+    error.value = "Merci de remplir tous les champs."
+    setTimeout(() => (error.value = ''), 5000)
     return
   }
 
-  // Simulation d'envoi
-  console.log("Message envoyé :", form.value)
+  // Reset des messages
+  sent.value = false
+  error.value = ''
+  sending.value = true
 
-  // Affiche le message de succès
-  sent.value = true
+  try {
+    // Préparer les données pour EmailJS
+    const templateParams = {
+      from_name: form.value.name,
+      from_email: form.value.email,
+      message: form.value.message,
+      site_name: form.value.siteName, // Champ caché avec le nom du site
+      to_email: TO_EMAIL, // Email de destination depuis les variables d'env
+      website: 'Roomies - Plateforme de Jeux en Ligne',
+      source_url: window.location.href,
+      timestamp: new Date().toLocaleString('fr-FR'),
+    }
 
-  // Réinitialise le formulaire
-  form.value = { name: '', email: '', message: '' }
+    // Envoyer l'email via EmailJS
+    const response = await emailjs.send(
+      EMAILJS_SERVICE_ID,
+      EMAILJS_TEMPLATE_ID,
+      templateParams,
+      EMAILJS_PUBLIC_KEY
+    )
 
-  // Masque le message après 5 secondes
-  setTimeout(() => (sent.value = false), 5000)
+    console.log('Email envoyé avec succès:', response)
+
+    // Affiche le message de succès
+    sent.value = true
+
+    // Réinitialise le formulaire
+    form.value = { name: '', email: '', message: '', siteName: 'Roomies' }
+
+    // Masque le message après 10 secondes
+    setTimeout(() => (sent.value = false), 10000)
+
+  } catch (err) {
+    console.error('Erreur envoi email:', err)
+    error.value = 'Une erreur est survenue lors de l\'envoi. Veuillez réessayer.'
+    setTimeout(() => (error.value = ''), 8000)
+  } finally {
+    sending.value = false
+  }
 }
 </script>
 

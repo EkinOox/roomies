@@ -164,13 +164,46 @@ class AdminController extends AbstractController
         }
 
         try {
+            // Vérifier les relations avant suppression
+            $ownedRooms = $user->getRooms(); // rooms qu'il possède
+            if ($ownedRooms->count() > 0) {
+                // Optionnel : transférer la propriété des rooms ou les supprimer
+                foreach ($ownedRooms as $room) {
+                    $this->entityManager->remove($room);
+                }
+            }
+
+            // Retirer l'utilisateur de ses relations
+            $user->getFavoris()->clear(); // ses jeux favoris
+            
+            // Trouver toutes les rooms où il participe
+            $roomRepository = $this->entityManager->getRepository(Room::class);
+            $participatingRooms = $roomRepository->createQueryBuilder('r')
+                ->join('r.participants', 'p')
+                ->where('p.id = :userId')
+                ->setParameter('userId', $user->getId())
+                ->getQuery()
+                ->getResult();
+            
+            foreach ($participatingRooms as $room) {
+                $room->removeParticipant($user);
+            }
+
             $this->entityManager->remove($user);
             $this->entityManager->flush();
+            
             return $this->json(['message' => 'Utilisateur supprimé'], Response::HTTP_OK);
-        } catch (\Exception $e) {
+        } catch (\Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException $e) {
             return $this->json([
-                'message' => 'Impossible de supprimer cet utilisateur (données liées)'
+                'message' => 'Impossible de supprimer cet utilisateur : il possède des rooms actives ou des données liées'
             ], Response::HTTP_CONFLICT);
+        } catch (\Exception $e) {
+            // Log l'erreur pour debug
+            error_log('Erreur suppression utilisateur: ' . $e->getMessage());
+            
+            return $this->json([
+                'message' => 'Erreur lors de la suppression : ' . $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -225,7 +258,7 @@ class AdminController extends AbstractController
         $room->setOwner($this->getUser()); // L'admin qui crée
         $room->setStatus('waiting');
         $room->setCreatedAt(new \DateTimeImmutable());
-        
+
         // Génération automatique du slug
         $slug = $this->generateSlug($data['name'] ?? '');
         $room->setSlug($slug);
@@ -357,7 +390,7 @@ class AdminController extends AbstractController
             ], Response::HTTP_CONFLICT);
         }
     }
-    
+
     /**
      * Génère un slug unique à partir d'un nom
      */
@@ -368,29 +401,29 @@ class AdminController extends AbstractController
         $slug = preg_replace('/[^a-z0-9\-]/', '-', $slug);
         $slug = preg_replace('/-+/', '-', $slug);
         $slug = trim($slug, '-');
-        
+
         // S'assurer que le slug n'est pas vide
         if (empty($slug)) {
             $slug = 'room';
         }
-        
+
         // Vérifier l'unicité et ajouter un suffixe si nécessaire
         $originalSlug = $slug;
         $counter = 1;
-        
+
         $roomRepository = $this->entityManager->getRepository(Room::class);
         do {
             $existingRoom = $roomRepository->findOneBy(['slug' => $slug]);
-            
+
             // Si pas de room trouvée ou si c'est la room qu'on exclut, le slug est valide
             if (!$existingRoom || ($excludeRoom && $existingRoom->getId() === $excludeRoom->getId())) {
                 break;
             }
-            
+
             $slug = $originalSlug . '-' . $counter;
             $counter++;
         } while (true);
-        
+
         return $slug;
     }
 }

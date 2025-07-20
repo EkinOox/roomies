@@ -77,6 +77,20 @@ socket.on('room:update', ({ roomId, participantsCount }) => {
   }
 })
 
+// ?? écouter les changements de statut
+socket.on('room:status-changed', ({ roomId, status, message, winner }) => {
+  if (room.value.id === roomId) {
+    room.value.status = status
+    console.log(`?? Statut room ${roomId} changé: ${status}`)
+    
+    // Optionnel: afficher un message é l'utilisateur
+    if (message) {
+      console.log(`?? ${message}`)
+      // Ici on pourrait ajouter une notification toast
+    }
+  }
+})
+
 onBeforeUnmount(async () => {
   // Socket : info aux autres clients
   socket.emit('leave-room', {

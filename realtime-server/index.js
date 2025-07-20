@@ -4,10 +4,22 @@ const http = require("http")
 const server = http.createServer()
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "http://localhost:5173",
     methods: ["GET", "POST"]
   }
 })
+
+// === UTILITAIRE : Communication avec le backend ===
+const updateRoomStatusInDB = async (roomId, status) => {
+  try {
+    // Note: En production, il faudrait un token de service pour l'authentification
+    console.log(`?? Mise à jour statut room ${roomId} ? ${status}`)
+    // Ici on pourrait faire un appel HTTP vers le backend si nécessaire
+    // Pour l'instant, on se contente de logger
+  } catch (error) {
+    console.error(`? Erreur mise à jour statut room ${roomId}:`, error)
+  }
+}
 
 // Stores
 const roomParticipants = new Map()
@@ -143,6 +155,13 @@ io.on("connection", (socket) => {
     state.winner = null
     state.startTime = Date.now()
 
+    // ?? Notifier que la partie commence (room ? active dans le backend)
+    io.to(`room_${roomId}`).emit('room:status-changed', { 
+      roomId, 
+      status: 'active',
+      message: 'La partie a commencé !' 
+    })
+
     io.to(`room_${roomId}`).emit('morpion:state', state)
     callback?.({ success: true })
   })
@@ -172,8 +191,22 @@ io.on("connection", (socket) => {
 
     if (hasWon) {
       state.winner = playerSymbol
+      // ?? Partie terminée avec un gagnant
+      io.to(`room_${roomId}`).emit('room:status-changed', { 
+        roomId, 
+        status: 'finished',
+        message: `?? ${userIdToName.get(userId) || userId} a gagné !`,
+        winner: playerSymbol
+      })
     } else if (state.board.every(cell => cell)) {
       state.winner = 'draw'
+      // ?? Partie terminée en égalité  
+      io.to(`room_${roomId}`).emit('room:status-changed', { 
+        roomId, 
+        status: 'finished',
+        message: '?? Match nul !',
+        winner: null
+      })
     } else {
       state.currentPlayer = state.currentPlayer === 'X' ? 'O' : 'X'
     }
@@ -196,7 +229,7 @@ io.on("connection", (socket) => {
   socket.on("chat:message", (msg) => {
     if (!msg || !msg.text) return
     io.emit("chat:message", msg)
-    console.log(`ğŸŒ [GLOBAL] ${msg.user}: ${msg.text}`)
+    console.log(`ğŸŒ [GLOBAL] ${msg.user}: ${msg.text}`)
   })
 
   // === Quitter la room
@@ -250,5 +283,5 @@ io.on("connection", (socket) => {
 })
 
 server.listen(3000, () => {
-  console.log("ğŸ–¥ï¸ Socket.IO serveur lancÃ© sur port 3000")
+  console.log("ğŸ–¥ï¸ Socket.IO serveur lancÃ© sur port 3000")
 })

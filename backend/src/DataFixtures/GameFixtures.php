@@ -32,20 +32,34 @@ class GameFixtures extends Fixture
                 'image' => '/img/games/echecs.png',
                 'description' => 'Jeu de stratégie classique opposant deux joueurs sur un damier.',
             ],
+            [
+                'name' => 'quizz',
+                'image' => '/img/games/quizz.png',
+                'description' => 'Jeu de questions-réponses pour tester vos connaissances.',
+            ],
         ];
 
         // Boucle sur chaque jeu défini dans le tableau
         foreach ($games as $g) {
-            // Création d'un nouvel objet Game
-            $game = new Game();
-            // Définition du nom du jeu
-            $game->setName($g['name']);
-            // Définition du chemin de l'image
-            $game->setImage($g['image']);
-            // Définition de la description
-            $game->setDescription($g['description']);
-            // On indique à Doctrine qu'on souhaite persister cet objet en base
-            $manager->persist($game);
+            // Vérifier si le jeu existe déjà en base
+            $existingGame = $manager->getRepository(Game::class)->findOneBy(['name' => $g['name']]);
+            
+            if (!$existingGame) {
+                // Création d'un nouvel objet Game seulement s'il n'existe pas
+                $game = new Game();
+                // Définition du nom du jeu
+                $game->setName($g['name']);
+                // Définition du chemin de l'image
+                $game->setImage($g['image']);
+                // Définition de la description
+                $game->setDescription($g['description']);
+                // On indique à Doctrine qu'on souhaite persister cet objet en base
+                $manager->persist($game);
+                
+                echo "✅ Jeu '{$g['name']}' créé avec succès\n";
+            } else {
+                echo "ℹ️  Le jeu '{$g['name']}' existe déjà\n";
+            }
         }
 
         // Exécution de l'enregistrement en base de données
