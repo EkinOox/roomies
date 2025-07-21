@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 class AuthControllerTest extends WebTestCase
 {
     private $client;
-    private EntityManagerInterface $entityManager;
+    private ?EntityManagerInterface $entityManager = null;
 
     protected function setUp(): void
     {
@@ -29,6 +29,17 @@ class AuthControllerTest extends WebTestCase
     {
         // Nettoyer aprÃ¨s chaque test
         $this->cleanDatabase();
+        
+        // Fermer l'entity manager pour éviter les fuites mémoire
+        if ($this->entityManager) {
+            $this->entityManager->close();
+            $this->entityManager = null;
+        }
+        
+        // Réinitialiser le kernel pour éviter les conflits
+        static::$kernel = null;
+        static::$booted = false;
+        
         parent::tearDown();
     }
 
@@ -38,8 +49,8 @@ class AuthControllerTest extends WebTestCase
     private function cleanDatabase(): void
     {
         $connection = $this->entityManager->getConnection();
-        $connection->executeStatement('DELETE FROM user');
-        $connection->executeStatement('DELETE FROM room');
+        $connection->executeStatement('DELETE FROM room');  // Supprimer d'abord les rooms
+        $connection->executeStatement('DELETE FROM user');  // Puis les users
     }
 
     /**

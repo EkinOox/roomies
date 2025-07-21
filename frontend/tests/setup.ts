@@ -17,6 +17,10 @@ const localStorageMock = {
 }
 
 // Mock des modules globaux
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+  writable: true
+})
 global.localStorage = localStorageMock
 
 // Configuration des stubs pour Vue Test Utils
@@ -29,7 +33,32 @@ config.global.stubs = {
   'router-view': true,
 
   // Stub pour les icônes PrimeIcons
-  'i': true
+  'i': true,
+  
+  // Stub pour les composants PrimeVue
+  'InputText': true,
+  'Password': true,
+  'Button': true,
+  'Toast': true,
+  'ProgressSpinner': true
+}
+
+// Mock des plugins globaux
+config.global.mocks = {
+  $toast: {
+    add: vi.fn(),
+    remove: vi.fn(),
+    clear: vi.fn()
+  }
+}
+
+// Provide des injections globales
+config.global.provide = {
+  toast: {
+    add: vi.fn(),
+    remove: vi.fn(),
+    clear: vi.fn()
+  }
 }
 
 // Mock d'Axios pour éviter les vraies requêtes HTTP
@@ -60,4 +89,13 @@ vi.mock('vue3-toastify', () => ({
     warning: vi.fn(),
     info: vi.fn()
   }
+}))
+
+// Mock de PrimeVue Toast
+vi.mock('primevue/usetoast', () => ({
+  useToast: vi.fn(() => ({
+    add: vi.fn(),
+    remove: vi.fn(),
+    clear: vi.fn()
+  }))
 }))

@@ -1,4 +1,4 @@
-# Makefile pour simplifier l'exÃ©cution des tests Roomies
+# Makefile pour simplifier l'exécution des tests Roomies
 .PHONY: help install test test-backend test-frontend test-e2e clean
 
 # Affiche l'aide avec toutes les commandes disponibles
@@ -46,8 +46,8 @@ test: test-backend test-frontend
 
 # Tests backend avec PHPUnit
 test-backend:
-	@echo "?? ExÃ©cution des tests backend..."
-	cd backend && php bin/phpunit
+	@echo "?? Exécution des tests backend..."
+	docker compose exec backend php bin/phpunit
 
 test-backend-coverage:
 	@echo "?? Tests backend avec couverture..."
@@ -55,8 +55,8 @@ test-backend-coverage:
 
 # Tests frontend avec Vitest
 test-frontend:
-	@echo "?? ExÃ©cution des tests frontend..."
-	cd frontend && npm run test
+	@echo "?? Exécution des tests frontend..."
+	cd frontend && npm run test:unit
 
 test-watch:
 	@echo "?? Tests frontend en mode watch..."

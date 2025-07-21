@@ -37,7 +37,7 @@ class RoomControllerTest extends WebTestCase
         
         $roomData = [
             'name' => 'Test Room',
-            'game' => $this->testGame->getName(),
+            'gameId' => $this->testGame->getId(),
             'maxPlayers' => 4
         ];
 
@@ -127,11 +127,11 @@ class RoomControllerTest extends WebTestCase
      */
     private function createTestData(): void
     {
-        // Nettoyer la base de donnÃ©es d'abord
+        // Nettoyer la base de donnÃ©es d'abord (ordre important à cause des clés étrangères)
         $connection = $this->entityManager->getConnection();
-        $connection->executeStatement('DELETE FROM user');
-        $connection->executeStatement('DELETE FROM game');
-        $connection->executeStatement('DELETE FROM room');
+        $connection->executeStatement('DELETE FROM room');  // Supprimer d'abord les rooms
+        $connection->executeStatement('DELETE FROM user');  // Puis les users
+        $connection->executeStatement('DELETE FROM game'); // Enfin les games
 
         // CrÃ©er un utilisateur de test avec un mot de passe correctement hachÃ©
         $uniqueId = uniqid();
@@ -209,7 +209,7 @@ class RoomControllerTest extends WebTestCase
             ],
             json_encode([
                 'name' => $name,
-                'game' => $this->testGame->getName(),
+                'gameId' => $this->testGame->getId(),
                 'maxPlayers' => 4
             ])
         );
@@ -217,12 +217,16 @@ class RoomControllerTest extends WebTestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-        
-        // Nettoyage aprÃ©s chaque test
+        // Fermer l'entity manager pour éviter les fuites mémoire
         if ($this->entityManager) {
             $this->entityManager->close();
             $this->entityManager = null;
         }
+        
+        // Réinitialiser le kernel pour éviter les conflits
+        static::$kernel = null;
+        static::$booted = false;
+        
+        parent::tearDown();
     }
 }
