@@ -13,11 +13,11 @@ const io = new Server(server, {
 const updateRoomStatusInDB = async (roomId, status) => {
   try {
     // Note: En production, il faudrait un token de service pour l'authentification
-    console.log(`?? Mise à jour statut room ${roomId} ? ${status}`)
-    // Ici on pourrait faire un appel HTTP vers le backend si nécessaire
+    console.log(`?? Mise ï¿½ jour statut room ${roomId} ? ${status}`)
+    // Ici on pourrait faire un appel HTTP vers le backend si nï¿½cessaire
     // Pour l'instant, on se contente de logger
   } catch (error) {
-    console.error(`? Erreur mise à jour statut room ${roomId}:`, error)
+    console.error(`? Erreur mise Ã  jour statut room ${roomId}:`, error)
   }
 }
 
@@ -159,7 +159,7 @@ io.on("connection", (socket) => {
     io.to(`room_${roomId}`).emit('room:status-changed', { 
       roomId, 
       status: 'active',
-      message: 'La partie a commencé !' 
+      message: 'La partie a commencï¿½ !' 
     })
 
     io.to(`room_${roomId}`).emit('morpion:state', state)
@@ -191,16 +191,16 @@ io.on("connection", (socket) => {
 
     if (hasWon) {
       state.winner = playerSymbol
-      // ?? Partie terminée avec un gagnant
+      // ?? Partie terminï¿½e avec un gagnant
       io.to(`room_${roomId}`).emit('room:status-changed', { 
         roomId, 
         status: 'finished',
-        message: `?? ${userIdToName.get(userId) || userId} a gagné !`,
+        message: `?? ${userIdToName.get(userId) || userId} a gagnï¿½ !`,
         winner: playerSymbol
       })
     } else if (state.board.every(cell => cell)) {
       state.winner = 'draw'
-      // ?? Partie terminée en égalité  
+      // ?? Partie terminï¿½e en ï¿½galitï¿½  
       io.to(`room_${roomId}`).emit('room:status-changed', { 
         roomId, 
         status: 'finished',

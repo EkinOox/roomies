@@ -69,6 +69,7 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+        
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
@@ -84,10 +85,22 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+  
+  uptime-kuma:
+    image: louislam/uptime-kuma
+    container_name: uptime-kuma
+    ports:
+      - "3001:3001"
+    volumes:
+      - uptime_kuma_data:/app/data
+    networks:
+      - frontend-backend
+    restart: unless-stopped
 
 volumes:
   mysql_data:
   frontend_node_modules:
+  uptime_kuma_data:
 
 networks:
   frontend-backend:
