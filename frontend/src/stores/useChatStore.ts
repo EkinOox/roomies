@@ -17,7 +17,7 @@ export const useChatStore = defineStore('chat', {
     addMessage(msg: ChatMessage) {
       this.messages.push(msg)
       if (this.messages.length > 300) {
-      this.messages.splice(0, this.messages.length - 100)
+      this.messages.splice(0, this.messages.length - 150)
       }
       this.saveToLocal()
     },

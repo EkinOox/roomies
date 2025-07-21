@@ -82,7 +82,7 @@ socket.on('room:status-changed', ({ roomId, status, message, winner }) => {
   if (room.value.id === roomId) {
     room.value.status = status
     console.log(`?? Statut room ${roomId} changé: ${status}`)
-    
+
     // Optionnel: afficher un message é l'utilisateur
     if (message) {
       console.log(`?? ${message}`)

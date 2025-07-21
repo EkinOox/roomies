@@ -139,7 +139,6 @@
                          [&_.p-paginator]:bg-slate-800/50
                          [&_.p-paginator]:border-t
                          [&_.p-paginator]:border-white/10" sortField="id" :sortOrder="-1">
-                  >
                   <Column field="id" header="ID" sortable class="w-16">
                     <template #body="slotProps">
                       <Badge :value="slotProps.data.id" severity="info" />
@@ -262,7 +261,6 @@
                          [&_.p-paginator]:bg-slate-800/50
                          [&_.p-paginator]:border-t
                          [&_.p-paginator]:border-white/10" sortField="createdAt" :sortOrder="-1">
-                  >
                   <Column field="id" header="ID" sortable class="w-16">
                     <template #body="slotProps">
                       <Badge :value="slotProps.data.id" severity="success" />
