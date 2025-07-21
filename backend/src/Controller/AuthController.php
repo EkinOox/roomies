@@ -110,7 +110,7 @@ final class AuthController extends AbstractController
             return $this->json(['message' => 'Identifiants invalides'], Response::HTTP_UNAUTHORIZED);
         }
 
-        // ? Mettre à jour lastActive lors de la connexion
+        // ? Mettre ï¿½ jour lastActive lors de la connexion
         $user->setLastActive(new \DateTimeImmutable());
         $em->flush();
 
@@ -125,6 +125,20 @@ final class AuthController extends AbstractController
         // Retourne le token au frontend pour l'authentification
         return $this->json([
             'token' => $token,
+        ]);
+    }
+
+    /**
+     * Route de health check publique pour les outils de monitoring
+     * Permet de vÃ©rifier que l'API backend fonctionne correctement
+     */
+    #[Route('/health', name: 'health_check', methods: ['GET'])]
+    public function healthCheck(): JsonResponse
+    {
+        return $this->json([
+            'status' => 'healthy',
+            'timestamp' => new \DateTime(),
+            'service' => 'roomies-backend'
         ]);
     }
 }

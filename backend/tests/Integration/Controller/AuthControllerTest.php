@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 class AuthControllerTest extends WebTestCase
 {
     private $client;
-    private ?EntityManagerInterface $entityManager = null;
+    private EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
@@ -29,17 +29,6 @@ class AuthControllerTest extends WebTestCase
     {
         // Nettoyer après chaque test
         $this->cleanDatabase();
-        
-        // Fermer l'entity manager pour �viter les fuites m�moire
-        if ($this->entityManager) {
-            $this->entityManager->close();
-            $this->entityManager = null;
-        }
-        
-        // R�initialiser le kernel pour �viter les conflits
-        static::$kernel = null;
-        static::$booted = false;
-        
         parent::tearDown();
     }
 
@@ -49,8 +38,44 @@ class AuthControllerTest extends WebTestCase
     private function cleanDatabase(): void
     {
         $connection = $this->entityManager->getConnection();
-        $connection->executeStatement('DELETE FROM room');  // Supprimer d'abord les rooms
-        $connection->executeStatement('DELETE FROM user');  // Puis les users
+        $connection->executeStatement('DELETE FROM user');
+        $connection->executeStatement('DELETE FROM room');
+    }
+
+    /**
+     * Test d'inscription avec des données valides
+     */
+    public function testRegisterWithValidData(): void
+    {
+        // Arrange - Données d'inscription valides avec un nom unique
+        $uniqueId = uniqid();
+        $userData = [
+            'email' => "test{$uniqueId}@example.com",
+            'username' => "testuser{$uniqueId}",
+            'password' => 'password123'
+        ];
+
+        // Act - Envoi de la requéte d'inscription
+        $this->client->request(
+            'POST',
+            '/register',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode($userData)
+        );
+
+        // Assert - Vérification de la réponse
+        $response = $this->client->getResponse();
+        if ($response->getStatusCode() !== Response::HTTP_CREATED) {
+            echo "Response content: " . $response->getContent() . "\n";
+        }
+        
+        $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
+        
+        $responseData = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('message', $responseData);
+        $this->assertEquals('Utilisateur créé', $responseData['message']);
     }
 
     /**
@@ -116,6 +141,63 @@ class AuthControllerTest extends WebTestCase
             echo "Response content: " . $response->getContent() . "\n";
         }
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+    }
+
+    /**
+     * Test de connexion avec des identifiants valides
+     */
+    public function testLoginWithValidCredentials(): void
+    {
+        // Arrange - Créer d'abord un utilisateur avec un ID unique
+        $uniqueId = uniqid();
+        $this->createTestUser("login{$uniqueId}@test.com", "loginuser{$uniqueId}", 'password123');
+
+        $loginData = [
+            'email' => "login{$uniqueId}@test.com",
+            'password' => 'password123'
+        ];
+
+        // Act
+        $this->client->request(
+            'POST',
+            '/login',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode($loginData)
+        );
+
+        // Assert
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        
+        $responseData = json_decode($this->client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('token', $responseData);
+        $this->assertNotEmpty($responseData['token']);
+    }
+
+    /**
+     * Test de connexion avec des identifiants invalides
+     */
+    public function testLoginWithInvalidCredentials(): void
+    {
+        // Arrange
+        $loginData = [
+            'email' => 'nonexistent@test.com',
+            'password' => 'wrongpassword'
+        ];
+
+        // Act
+        $this->client->request(
+            'POST',
+            '/login',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode($loginData)
+        );
+
+        // Assert
+        $this->assertEquals(Response::HTTP_UNAUTHORIZED, $this->client->getResponse()->getStatusCode());
     }
 
     /**
